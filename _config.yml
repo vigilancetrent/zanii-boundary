@@ -1,0 +1,30 @@
+title: Zanii Boundary
+description: Testing company-agent security boundaries
+theme: jekyll-theme-cayman
+
+# Layout without front matter so the Markdown files stay clean on GitHub.
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: default
+
+# Publish the paper and docs only; source and fixtures are served from the repo.
+exclude:
+  - src
+  - test
+  - sdk
+  - scripts
+  - fixtures
+  - migrations
+  - monitoring
+  - deploy
+  - config
+  - archive
+  - artifacts
+  - node_modules
+  - package.json
+  - package-lock.json
+  - requirements-ci.txt
+  - Dockerfile
+  - .github

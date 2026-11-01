@@ -2,7 +2,7 @@
 
 **Author and organization:** zinii ai  
 **Date:** 1 November 2026  
-**Status:** local engineering white-paper draft; not peer reviewed or published
+**Status:** public engineering preprint; not peer reviewed
 
 ## Abstract
 
