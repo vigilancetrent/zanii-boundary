@@ -1,6 +1,6 @@
 # Zanii Boundary: testing company-agent security boundaries
 
-**Author and organization:** zinii ai  
+**Authors:** Louis Chifura, zaniiai  
 **Date:** 1 November 2026  
 **Status:** public engineering preprint; not peer reviewed
 

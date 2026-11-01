@@ -1,0 +1,55 @@
+Zanii Boundary - arXiv submission sheet
+Generated 1 November 2026. Copy the fields below into arxiv.org/submit.
+The PDF is paper/arxiv/zanii-boundary-arxiv.pdf (8 pages, A4, fonts embedded, 135 KB).
+
+------------------------------------------------------------
+TITLE
+------------------------------------------------------------
+Zanii Boundary: testing company-agent security boundaries
+
+------------------------------------------------------------
+AUTHORS  (comma separated, no affiliations)
+------------------------------------------------------------
+Louis Chifura, zaniiai
+
+------------------------------------------------------------
+ABSTRACT  (plain text, 1404 characters, limit 1920)
+------------------------------------------------------------
+Company agents need limits that remain enforceable when an agent follows malicious instructions. This paper presents a reference implementation for a declared document workflow: a trusted gateway authorizes exact actions, reserves durable operation state, keeps upstream credentials outside the agent, and dispatches to a resource that independently checks a sender-bound grant. Production admission additionally requires a recent signed record of explicit containment checks. An advisory detector can learn from independently reviewed examples without acquiring permission to change task authority.
+
+The implementation now includes real TLS/mTLS, shared PostgreSQL authority, fenced maintenance, tenant/version-bound object encryption, independent audit/archive roles, resumable encrypted backup and quarantined recovery, bounded learning, protocol adapters and a strict Linux deployment profile. The actual upstream Runtime 0.4.0 executes a fixed reversible authorization preflight with accepted local ledger receipts; durable company effects remain governed by Boundary. Local tests use actual loopback TLS and SQL contracts with synthetic company data. Real Linux/container/provider/HA/customer acceptance remains incomplete. The contribution is a reproducible engineering design and measurement method; this paper establishes neither a new authorization primitive nor worldwide invention priority.
+
+------------------------------------------------------------
+CATEGORIES
+------------------------------------------------------------
+Primary:    cs.CR  (Cryptography and Security)
+Cross-list: cs.AI, cs.SE
+
+------------------------------------------------------------
+COMMENTS
+------------------------------------------------------------
+8 pages, 2 tables. Engineering preprint; not peer reviewed. Code: https://github.com/vigilancetrent/zanii-boundary
+
+------------------------------------------------------------
+LICENSE
+------------------------------------------------------------
+CC BY 4.0  (recommended: allows reuse with attribution)
+
+------------------------------------------------------------
+EMPTY FIELDS
+------------------------------------------------------------
+Journal reference: none
+DOI: none
+Report number: none
+ACM classification: none
+MSC classification: none
+
+------------------------------------------------------------
+BEFORE YOU SUBMIT
+------------------------------------------------------------
+1. cs.CR requires an endorsement for a first submission. Request it at
+   arxiv.org/auth/request-endorsement (endorser code from a cs.CR author).
+2. Upload only the PDF. arXiv metadata comes from the form, not the file.
+3. Check the preview: the header must read "Authors: Louis Chifura, zaniiai".
+4. Announcement is public and permanent; changes are only possible via
+   replacement versions.
