@@ -48,7 +48,7 @@ jobs:
       - name: Build pinned base into OCI with native BuildKit provenance
         run: node scripts/security-report.mjs build --platform linux/amd64
       - name: Install the exact native scanner from the pinned official setup action
-        uses: aquasecurity/setup-trivy@3fb12ec12f41e471780db15c232d5dd185dcb514 # official 0.2.6
+        uses: aquasecurity/setup-trivy@81e514348e19b6112ce2a7e3ecbafe19c1e1f567 # official 0.3.1
         with:
           version: v0.76.1
       - name: Create an isolated job-local scanner producer identity
