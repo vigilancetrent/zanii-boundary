@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "stateDirectory": "/secure/acceptance/controllers",
+  "acceptanceConfig": "acceptance.json",
+  "probeConfig": "/secure/acceptance/gateway-probe.json",
+  "service": "gateway",
+  "samples": 10,
+  "intervalMs": 500,
+  "recoveryMs": 30000,
+  "observeMs": 30000,
+  "cooldownMs": 10000,
+  "scaleUpAbove": 0.75,
+  "scaleDownBelow": 0.2,
+  "stableSamples": 3
+}

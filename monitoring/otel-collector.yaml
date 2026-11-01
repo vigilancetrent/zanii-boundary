@@ -1,0 +1,367 @@
+{
+  "receivers": {
+    "otlp": {
+      "protocols": {
+        "http": {
+          "endpoint": "0.0.0.0:4318",
+          "max_request_body_size": 1048576,
+          "tls": {
+            "cert_file": "/run/monitoring/collector/server-cert.pem",
+            "key_file": "/run/monitoring/collector/server-key.pem",
+            "client_ca_file": "/run/monitoring/collector/client-ca.pem",
+            "min_version": "1.3"
+          }
+        }
+      }
+    },
+    "filelog/gateway": {
+      "include": [
+        "/var/log/runtime/gateway/runtime-*.jsonl"
+      ],
+      "start_at": "beginning",
+      "include_file_path": false,
+      "include_file_name": false,
+      "max_log_size": "4KiB",
+      "storage": "file_storage",
+      "resource": {
+        "service.name": "runtime-gateway"
+      }
+    },
+    "filelog/resource": {
+      "include": [
+        "/var/log/runtime/resource/runtime-*.jsonl"
+      ],
+      "start_at": "beginning",
+      "include_file_path": false,
+      "include_file_name": false,
+      "max_log_size": "4KiB",
+      "storage": "file_storage",
+      "resource": {
+        "service.name": "runtime-resource"
+      }
+    },
+    "filelog/worker-gateway": {
+      "include": [
+        "/var/log/runtime/worker-gateway/runtime-*.jsonl"
+      ],
+      "start_at": "beginning",
+      "include_file_path": false,
+      "include_file_name": false,
+      "max_log_size": "4KiB",
+      "storage": "file_storage",
+      "resource": {
+        "service.name": "runtime-worker-gateway"
+      }
+    },
+    "filelog/worker-resource": {
+      "include": [
+        "/var/log/runtime/worker-resource/runtime-*.jsonl"
+      ],
+      "start_at": "beginning",
+      "include_file_path": false,
+      "include_file_name": false,
+      "max_log_size": "4KiB",
+      "storage": "file_storage",
+      "resource": {
+        "service.name": "runtime-worker-resource"
+      }
+    },
+    "filelog/archive-gateway": {
+      "include": [
+        "/var/log/runtime/archive-gateway/runtime-*.jsonl"
+      ],
+      "start_at": "beginning",
+      "include_file_path": false,
+      "include_file_name": false,
+      "max_log_size": "4KiB",
+      "storage": "file_storage",
+      "resource": {
+        "service.name": "runtime-archive-gateway"
+      }
+    },
+    "filelog/archive-resource": {
+      "include": [
+        "/var/log/runtime/archive-resource/runtime-*.jsonl"
+      ],
+      "start_at": "beginning",
+      "include_file_path": false,
+      "include_file_name": false,
+      "max_log_size": "4KiB",
+      "storage": "file_storage",
+      "resource": {
+        "service.name": "runtime-archive-resource"
+      }
+    },
+    "filelog/backup-gateway": {
+      "include": [
+        "/var/log/runtime/backup-gateway/runtime-*.jsonl"
+      ],
+      "start_at": "beginning",
+      "include_file_path": false,
+      "include_file_name": false,
+      "max_log_size": "4KiB",
+      "storage": "file_storage",
+      "resource": {
+        "service.name": "runtime-backup-gateway"
+      }
+    },
+    "filelog/backup-resource": {
+      "include": [
+        "/var/log/runtime/backup-resource/runtime-*.jsonl"
+      ],
+      "start_at": "beginning",
+      "include_file_path": false,
+      "include_file_name": false,
+      "max_log_size": "4KiB",
+      "storage": "file_storage",
+      "resource": {
+        "service.name": "runtime-backup-resource"
+      }
+    }
+  },
+  "processors": {
+    "memory_limiter": {
+      "check_interval": "1s",
+      "limit_mib": 256,
+      "spike_limit_mib": 64
+    },
+    "batch": {
+      "send_batch_size": 16,
+      "send_batch_max_size": 16,
+      "timeout": "1s"
+    },
+    "filter/events": {
+      "error_mode": "propagate",
+      "traces": {
+        "spanevent": [
+          "true"
+        ]
+      }
+    },
+    "transform/redact": {
+      "error_mode": "propagate",
+      "trace_statements": [
+        {
+          "context": "resource",
+          "statements": [
+            "keep_keys(attributes, [\"service.name\"])"
+          ]
+        },
+        {
+          "context": "span",
+          "statements": [
+            "keep_keys(attributes, [\"http.route\", \"http.request.method\", \"http.response.status_code\", \"db.system\", \"db.operation.name\", \"runtime.dependency\", \"runtime.operation\", \"runtime.job.kind\", \"runtime.job.attempt\", \"error.type\"])",
+            "truncate_all(attributes, 128)"
+          ]
+        }
+      ],
+      "log_statements": [
+        {
+          "context": "resource",
+          "statements": [
+            "keep_keys(attributes, [\"service.name\"])"
+          ]
+        },
+        {
+          "context": "log",
+          "statements": [
+            "merge_maps(cache, ParseJSON(body), \"upsert\")",
+            "keep_keys(cache, [\"at\", \"level\", \"event\", \"requestId\", \"traceparent\", \"route\", \"method\", \"status\", \"durationMs\", \"kind\", \"state\", \"code\"])",
+            "set(body, cache)",
+            "keep_keys(attributes, [])"
+          ]
+        }
+      ],
+      "metric_statements": [
+        {
+          "context": "resource",
+          "statements": [
+            "keep_keys(attributes, [\"service.name\"])"
+          ]
+        }
+      ]
+    }
+  },
+  "exporters": {
+    "otlp_http/tempo": {
+      "endpoint": "https://tempo:4318",
+      "tls": {
+        "ca_file": "/run/monitoring/collector/ca.pem",
+        "cert_file": "/run/monitoring/collector/client-cert.pem",
+        "key_file": "/run/monitoring/collector/client-key.pem",
+        "min_version": "1.3",
+        "insecure": false,
+        "insecure_skip_verify": false
+      },
+      "encoding": "proto",
+      "compression": "none",
+      "timeout": "5s",
+      "sending_queue": {
+        "enabled": true,
+        "num_consumers": 2,
+        "queue_size": 128,
+        "storage": "file_storage"
+      },
+      "retry_on_failure": {
+        "enabled": true,
+        "initial_interval": "1s",
+        "max_interval": "5s",
+        "max_elapsed_time": "30s"
+      }
+    },
+    "otlp_http/loki": {
+      "endpoint": "https://loki:3100/otlp",
+      "tls": {
+        "ca_file": "/run/monitoring/collector/ca.pem",
+        "cert_file": "/run/monitoring/collector/client-cert.pem",
+        "key_file": "/run/monitoring/collector/client-key.pem",
+        "min_version": "1.3",
+        "insecure": false,
+        "insecure_skip_verify": false
+      },
+      "encoding": "proto",
+      "compression": "none",
+      "timeout": "5s",
+      "sending_queue": {
+        "enabled": true,
+        "num_consumers": 2,
+        "queue_size": 128,
+        "storage": "file_storage"
+      },
+      "retry_on_failure": {
+        "enabled": true,
+        "initial_interval": "1s",
+        "max_interval": "5s",
+        "max_elapsed_time": "30s"
+      }
+    },
+    "otlp_http/receipt": {
+      "endpoint": "https://monitoring-receiver:9444",
+      "tls": {
+        "ca_file": "/run/monitoring/collector/ca.pem",
+        "cert_file": "/run/monitoring/collector/client-cert.pem",
+        "key_file": "/run/monitoring/collector/client-key.pem",
+        "min_version": "1.3",
+        "insecure": false,
+        "insecure_skip_verify": false
+      },
+      "encoding": "json",
+      "compression": "none",
+      "timeout": "5s",
+      "sending_queue": {
+        "enabled": true,
+        "num_consumers": 2,
+        "queue_size": 128,
+        "storage": "file_storage"
+      },
+      "retry_on_failure": {
+        "enabled": true,
+        "initial_interval": "1s",
+        "max_interval": "5s",
+        "max_elapsed_time": "30s"
+      }
+    },
+    "prometheus/internal": {
+      "endpoint": "0.0.0.0:8889",
+      "tls": {
+        "cert_file": "/run/monitoring/collector/server-cert.pem",
+        "key_file": "/run/monitoring/collector/server-key.pem",
+        "client_ca_file": "/run/monitoring/collector/ca.pem",
+        "min_version": "1.3"
+      },
+      "add_metric_suffixes": false,
+      "resource_to_telemetry_conversion": {
+        "enabled": false
+      }
+    }
+  },
+  "extensions": {
+    "file_storage": {
+      "directory": "/var/lib/otel/queue"
+    }
+  },
+  "service": {
+    "extensions": [
+      "file_storage"
+    ],
+    "telemetry": {
+      "logs": {
+        "level": "info"
+      },
+      "resource": {
+        "service.name": "runtime-otel-collector"
+      },
+      "metrics": {
+        "readers": [
+          {
+            "periodic": {
+              "interval": 5000,
+              "exporter": {
+                "otlp": {
+                  "protocol": "http/protobuf",
+                  "endpoint": "https://otel-collector:4318/v1/metrics",
+                  "certificate": "/run/monitoring/collector/ca.pem",
+                  "client_certificate": "/run/monitoring/collector/client-cert.pem",
+                  "client_key": "/run/monitoring/collector/client-key.pem",
+                  "compression": "none",
+                  "timeout": 5000
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "pipelines": {
+      "traces": {
+        "receivers": [
+          "otlp"
+        ],
+        "processors": [
+          "memory_limiter",
+          "filter/events",
+          "transform/redact",
+          "batch"
+        ],
+        "exporters": [
+          "otlp_http/tempo",
+          "otlp_http/receipt"
+        ]
+      },
+      "logs": {
+        "receivers": [
+          "filelog/gateway",
+          "filelog/resource",
+          "filelog/worker-gateway",
+          "filelog/worker-resource",
+          "filelog/archive-gateway",
+          "filelog/archive-resource",
+          "filelog/backup-gateway",
+          "filelog/backup-resource"
+        ],
+        "processors": [
+          "memory_limiter",
+          "transform/redact",
+          "batch"
+        ],
+        "exporters": [
+          "otlp_http/loki",
+          "otlp_http/receipt"
+        ]
+      },
+      "metrics/internal": {
+        "receivers": [
+          "otlp"
+        ],
+        "processors": [
+          "memory_limiter",
+          "transform/redact",
+          "batch"
+        ],
+        "exporters": [
+          "prometheus/internal"
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,76 @@
+{
+  "version": 2,
+  "kind": "linux-distributed-v2",
+  "receiptLifetimeMs": 900000,
+  "socketPath": "/run/runtime/gateway.sock",
+  "roles": {
+    "gateway": {
+      "minimum": 2,
+      "maximum": 4,
+      "maxConnections": 8
+    },
+    "resource": {
+      "minimum": 2,
+      "maximum": 4,
+      "maxConnections": 8
+    },
+    "worker": {
+      "minimum": 1,
+      "maximum": 2,
+      "maxConnections": 4
+    },
+    "archive": {
+      "minimum": 1,
+      "maximum": 1,
+      "maxConnections": 2
+    },
+    "backup": {
+      "minimum": 1,
+      "maximum": 1,
+      "maxConnections": 2
+    },
+    "rotator": {
+      "minimum": 1,
+      "maximum": 1,
+      "maxConnections": 2
+    },
+    "migrator": {
+      "minimum": 1,
+      "maximum": 1,
+      "maxConnections": 1
+    }
+  },
+  "database": {
+    "maxConnections": 128,
+    "serverReserved": 3,
+    "adminReserve": 4
+  },
+  "providers": [
+    {
+      "name": "postgres",
+      "host": "postgres.company.invalid",
+      "port": 5432,
+      "addresses": [
+        "192.0.2.10"
+      ]
+    },
+    {
+      "name": "objects",
+      "host": "objects.company.invalid",
+      "port": 443,
+      "addresses": [
+        "192.0.2.20"
+      ]
+    },
+    {
+      "name": "kms",
+      "host": "kms.company.invalid",
+      "port": 443,
+      "addresses": [
+        "192.0.2.30"
+      ]
+    }
+  ],
+  "providerSubnet": "172.31.240.0/24",
+  "logQuotaBytes": 536870912
+}

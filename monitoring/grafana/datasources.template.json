@@ -1,0 +1,65 @@
+{
+  "apiVersion": 1,
+  "datasources": [
+    {
+      "name": "Prometheus",
+      "uid": "runtime-prometheus",
+      "type": "prometheus",
+      "access": "proxy",
+      "url": "https://prometheus:9090",
+      "isDefault": true,
+      "editable": false,
+      "jsonData": {
+        "tlsAuth": true,
+        "tlsAuthWithCACert": true,
+        "tlsSkipVerify": false,
+        "serverName": "prometheus"
+      },
+      "secureJsonData": {
+        "tlsCACert": "__CA_FILE__",
+        "tlsClientCert": "__CLIENT_CERT_FILE__",
+        "tlsClientKey": "__CLIENT_KEY_FILE__"
+      }
+    },
+    {
+      "name": "Loki",
+      "uid": "loki",
+      "type": "loki",
+      "access": "proxy",
+      "url": "https://loki:3100",
+      "isDefault": false,
+      "editable": false,
+      "jsonData": {
+        "tlsAuth": true,
+        "tlsAuthWithCACert": true,
+        "tlsSkipVerify": false,
+        "serverName": "loki"
+      },
+      "secureJsonData": {
+        "tlsCACert": "__CA_FILE__",
+        "tlsClientCert": "__CLIENT_CERT_FILE__",
+        "tlsClientKey": "__CLIENT_KEY_FILE__"
+      }
+    },
+    {
+      "name": "Tempo",
+      "uid": "tempo",
+      "type": "tempo",
+      "access": "proxy",
+      "url": "https://tempo:3200",
+      "isDefault": false,
+      "editable": false,
+      "jsonData": {
+        "tlsAuth": true,
+        "tlsAuthWithCACert": true,
+        "tlsSkipVerify": false,
+        "serverName": "tempo"
+      },
+      "secureJsonData": {
+        "tlsCACert": "__CA_FILE__",
+        "tlsClientCert": "__CLIENT_CERT_FILE__",
+        "tlsClientKey": "__CLIENT_KEY_FILE__"
+      }
+    }
+  ]
+}

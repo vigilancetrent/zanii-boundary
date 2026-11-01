@@ -1,0 +1,18 @@
+Use case: ads-marketing.
+Asset type: original premium developer-infrastructure brand banner for Zanii Boundary. Create one finished widescreen banner, approximately 3:1 aspect ratio, high resolution. This is an original art-directed design, not a screenshot or a website mockup.
+
+Concept: THE APERTURE. Make the product's idea of narrowly controlled execution tangible with a beautifully crafted architectural sculpture. On the right half, an imposing upright graphite slab stands across a horizontal route. A single extremely precise rectangular aperture has been machined through the slab. A slender mint-green ribbon travels from the near side, through this narrow opening, and out to a small clean white document-like rectangular tile on the far side. Most of the slab remains solid: the opening is the memorable symbol of limited access. Use elegant axonometric perspective and credible industrial materials, fine bevels, subtle graphite grain, realistic contact shadows, and soft studio lighting. This is conceptual brand artwork, not a literal engineering diagram.
+
+Composition: large confident typography occupies the left 48%; the original sculptural artwork occupies the right 48%, with an intentionally dramatic crop at the right edge. Dark graphite canvas, clear negative space around copy, very subtle physically plausible tonal changes. A fine dividing rule and small product detail can anchor the bottom. Purposeful asymmetry and restrained sophistication. Everything reads at README header size.
+
+Text, exactly and only:
+"ZANII"
+"Zanii Boundary"
+"Controlled execution for company AI agents."
+"TASK-SCOPED ACCESS / INDEPENDENT RESOURCE CHECKS"
+
+Typography: beautifully typeset contemporary Swiss grotesk, like Inter Display or Suisse International. The product name is oversized, near-white, medium weight, exceptionally sharp and legible. Supporting sentence smaller, in soft light gray. Brand label and bottom technical caption small, carefully tracked uppercase. Keep all text safely inside generous margins. Do not duplicate the product name, misspell words, add claims, or add extra text.
+
+Palette: nearly black graphite #101415, off-white #f7f8f8, restrained mint #8dd9c2 exclusively for the permitted route and aperture edge. The grayscale architecture should feel tactile and expensive. Use natural studio shading, not decorative background gradients. Inspiration is the restraint of Linear's typography and the industrial credibility of Oxide's hardware art direction, but invent this sculpture and composition from scratch.
+
+Avoid: shields, padlocks, robots, brains, glowing AI orbs, circuit-board wallpaper, decorative grids, particle clouds, purple/blue gradients, neon bloom, glassmorphism, stock security imagery, UI cards, flowchart boxes, dashboard mockups, template layouts, fake metrics, glossy plastic, excessive tiny labels, watermarks. The finished image should feel commissioned from an excellent brand studio.

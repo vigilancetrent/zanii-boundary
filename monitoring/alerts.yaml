@@ -1,0 +1,357 @@
+{
+  "groups": [
+    {
+      "name": "runtime-operations",
+      "rules": [
+        {
+          "alert": "RuntimeScrapeUnavailable",
+          "expr": "up{job=~\"runtime-.*\"} == 0",
+          "for": "2m",
+          "labels": {
+            "severity": "critical"
+          },
+          "annotations": {
+            "summary": "A runtime or probe scrape is unavailable.",
+            "runbook_url": "../docs/monitoring-runbook.md#scrape"
+          }
+        },
+        {
+          "alert": "RuntimeProbeFailed",
+          "expr": "runtime_probe_success == 0",
+          "for": "2m",
+          "labels": {
+            "severity": "warning"
+          },
+          "annotations": {
+            "summary": "A fixed liveness, startup or readiness probe failed.",
+            "runbook_url": "../docs/monitoring-runbook.md#probes"
+          }
+        },
+        {
+          "alert": "RuntimeErrorRate",
+          "expr": "sum by (job) (rate(runtime_http_requests_total{status_class=\"5xx\"}[5m])) / clamp_min(sum by (job) (rate(runtime_http_requests_total[5m])), 0.01) > 0.05",
+          "for": "2m",
+          "labels": {
+            "severity": "warning"
+          },
+          "annotations": {
+            "summary": "Runtime server error ratio exceeds five percent.",
+            "runbook_url": "../docs/monitoring-runbook.md#http"
+          }
+        },
+        {
+          "alert": "RuntimeLatency",
+          "expr": "histogram_quantile(0.95, sum by (le, job) (rate(runtime_http_request_duration_seconds_bucket[5m]))) > 2",
+          "for": "2m",
+          "labels": {
+            "severity": "warning"
+          },
+          "annotations": {
+            "summary": "Runtime p95 HTTP latency exceeds two seconds.",
+            "runbook_url": "../docs/monitoring-runbook.md#http"
+          }
+        },
+        {
+          "alert": "RuntimeSaturation",
+          "expr": "runtime_saturation_ratio > 0.85",
+          "for": "2m",
+          "labels": {
+            "severity": "warning"
+          },
+          "annotations": {
+            "summary": "Runtime admission uses over 85 percent of its configured concurrency ceiling.",
+            "runbook_url": "../docs/monitoring-runbook.md#capacity"
+          }
+        },
+        {
+          "alert": "RuntimeEventLoopDelay",
+          "expr": "runtime_event_loop_delay_seconds{stat=\"p99\"} > 0.25",
+          "for": "2m",
+          "labels": {
+            "severity": "warning"
+          },
+          "annotations": {
+            "summary": "Runtime event loop p99 delay exceeds 250ms.",
+            "runbook_url": "../docs/monitoring-runbook.md#capacity"
+          }
+        },
+        {
+          "alert": "RuntimeDatabasePoolWaiting",
+          "expr": "runtime_db_pool_waiting > 0",
+          "for": "2m",
+          "labels": {
+            "severity": "warning"
+          },
+          "annotations": {
+            "summary": "Datastore acquisitions are waiting.",
+            "runbook_url": "../docs/monitoring-runbook.md#database"
+          }
+        },
+        {
+          "alert": "RuntimeDatabaseErrors",
+          "expr": "sum by (job) (rate(runtime_store_errors_total[5m])) > 0",
+          "for": "2m",
+          "labels": {
+            "severity": "warning"
+          },
+          "annotations": {
+            "summary": "Runtime datastore operation errors are occurring.",
+            "runbook_url": "../docs/monitoring-runbook.md#database"
+          }
+        },
+        {
+          "alert": "RuntimeDiskLow",
+          "expr": "runtime_disk_free_bytes < 1073741824",
+          "for": "2m",
+          "labels": {
+            "severity": "warning"
+          },
+          "annotations": {
+            "summary": "The measured runtime data/log filesystem has under one GiB free.",
+            "runbook_url": "../docs/monitoring-runbook.md#storage"
+          }
+        },
+        {
+          "alert": "RuntimeDiskMeasurementMissing",
+          "expr": "runtime_signal_available{signal=\"disk_free_bytes\"} == 0",
+          "for": "2m",
+          "labels": {
+            "severity": "warning"
+          },
+          "annotations": {
+            "summary": "Runtime free disk bytes are unknown.",
+            "runbook_url": "../docs/monitoring-runbook.md#storage"
+          }
+        },
+        {
+          "alert": "RuntimeRequiredMaintenanceUnavailable",
+          "expr": "runtime_maintenance_role_ready == 0 and on (job,instance,role) runtime_maintenance_role_required == 1",
+          "for": "2m",
+          "labels": {
+            "severity": "critical"
+          },
+          "annotations": {
+            "summary": "Required maintenance is not ready.",
+            "runbook_url": "../docs/monitoring-runbook.md#maintenance"
+          }
+        },
+        {
+          "alert": "RuntimeMaintenanceDeadLetters",
+          "expr": "runtime_maintenance_jobs{state=\"dead\"} > 0",
+          "for": "2m",
+          "labels": {
+            "severity": "critical"
+          },
+          "annotations": {
+            "summary": "A durable maintenance role has dead letters.",
+            "runbook_url": "../docs/monitoring-runbook.md#maintenance"
+          }
+        },
+        {
+          "alert": "RuntimeMaintenanceBacklog",
+          "expr": "runtime_maintenance_oldest_due_age_seconds > 300",
+          "for": "2m",
+          "labels": {
+            "severity": "warning"
+          },
+          "annotations": {
+            "summary": "Durable due work has waited over five minutes.",
+            "runbook_url": "../docs/monitoring-runbook.md#maintenance"
+          }
+        },
+        {
+          "alert": "RuntimeBackupCaptureStale",
+          "expr": "runtime_backup_snapshot_age_seconds > runtime_backup_max_age_seconds",
+          "for": "2m",
+          "labels": {
+            "severity": "critical"
+          },
+          "annotations": {
+            "summary": "The signed recovery point capture exceeds the configured age.",
+            "runbook_url": "../docs/monitoring-runbook.md#backup"
+          }
+        },
+        {
+          "alert": "RuntimeBackupVerificationStale",
+          "expr": "runtime_backup_verification_age_seconds > runtime_backup_max_age_seconds",
+          "for": "2m",
+          "labels": {
+            "severity": "critical"
+          },
+          "annotations": {
+            "summary": "Backup verification exceeds the configured age.",
+            "runbook_url": "../docs/monitoring-runbook.md#backup"
+          }
+        },
+        {
+          "alert": "RuntimeArchiveStale",
+          "expr": "runtime_archive_age_seconds > runtime_archive_max_age_seconds",
+          "for": "2m",
+          "labels": {
+            "severity": "warning"
+          },
+          "annotations": {
+            "summary": "Verified audit archive age exceeds the configured maximum.",
+            "runbook_url": "../docs/monitoring-runbook.md#archive"
+          }
+        },
+        {
+          "alert": "RuntimeCertificateExpiring",
+          "expr": "runtime_certificate_expiry_seconds < 604800",
+          "for": "2m",
+          "labels": {
+            "severity": "warning"
+          },
+          "annotations": {
+            "summary": "Runtime TLS certificate expires within seven days.",
+            "runbook_url": "../docs/monitoring-runbook.md#certificates"
+          }
+        },
+        {
+          "alert": "RuntimeContainmentExpiring",
+          "expr": "runtime_containment_expiry_seconds < 300",
+          "for": "2m",
+          "labels": {
+            "severity": "critical"
+          },
+          "annotations": {
+            "summary": "Verified deployment containment evidence expires within five minutes.",
+            "runbook_url": "../docs/monitoring-runbook.md#containment"
+          }
+        },
+        {
+          "alert": "RuntimeDependencyOpen",
+          "expr": "runtime_dependency_circuit_state == 2",
+          "for": "2m",
+          "labels": {
+            "severity": "warning"
+          },
+          "annotations": {
+            "summary": "A fixed configured dependency circuit is open.",
+            "runbook_url": "../docs/monitoring-runbook.md#dependencies"
+          }
+        },
+        {
+          "alert": "RuntimeUnknownAction",
+          "expr": "sum by (job) (increase(runtime_action_outcomes_total{state=\"unknown\"}[5m])) > 0",
+          "for": "2m",
+          "labels": {
+            "severity": "critical"
+          },
+          "annotations": {
+            "summary": "An action has an unknown outcome; reconcile before resubmitting.",
+            "runbook_url": "../docs/monitoring-runbook.md#unknown-actions"
+          }
+        },
+        {
+          "alert": "RuntimeLogSinkFailed",
+          "expr": "runtime_log_sink_healthy == 0",
+          "for": "2m",
+          "labels": {
+            "severity": "critical"
+          },
+          "annotations": {
+            "summary": "Configured structured log sink is unhealthy.",
+            "runbook_url": "../docs/monitoring-runbook.md#logs"
+          }
+        },
+        {
+          "alert": "RuntimeLogsDropped",
+          "expr": "increase(runtime_log_dropped_events[5m]) > 0 or increase(runtime_log_write_failures[5m]) > 0",
+          "for": "2m",
+          "labels": {
+            "severity": "warning"
+          },
+          "annotations": {
+            "summary": "The bounded log sink dropped events or failed writes.",
+            "runbook_url": "../docs/monitoring-runbook.md#logs"
+          }
+        },
+        {
+          "alert": "RuntimeTraceExportFailed",
+          "expr": "increase(runtime_telemetry_export_failures[5m]) > 0",
+          "for": "2m",
+          "labels": {
+            "severity": "warning"
+          },
+          "annotations": {
+            "summary": "The runtime OTEL exporter failed to acknowledge spans.",
+            "runbook_url": "../docs/monitoring-runbook.md#telemetry"
+          }
+        },
+        {
+          "alert": "MonitoringCollectorExportFailed",
+          "expr": "increase(otelcol_exporter_send_failed_spans[5m]) > 0 or increase(otelcol_exporter_send_failed_log_records[5m]) > 0",
+          "for": "2m",
+          "labels": {
+            "severity": "warning"
+          },
+          "annotations": {
+            "summary": "The collector could not send spans or log records.",
+            "runbook_url": "../docs/monitoring-runbook.md#telemetry"
+          }
+        },
+        {
+          "alert": "MonitoringComponentUnavailable",
+          "expr": "up{job=~\"monitoring-receiver|otel-collector|loki|tempo\"} == 0",
+          "for": "2m",
+          "labels": {
+            "severity": "critical"
+          },
+          "annotations": {
+            "summary": "A provisioned monitoring component is unavailable.",
+            "runbook_url": "../docs/monitoring-runbook.md#monitoring"
+          }
+        },
+        {
+          "alert": "MonitoringReceiverDenied",
+          "expr": "increase(monitoring_receiver_denied_total[5m]) > 0",
+          "for": "2m",
+          "labels": {
+            "severity": "warning"
+          },
+          "annotations": {
+            "summary": "The controlled receipt receiver rejected an input.",
+            "runbook_url": "../docs/monitoring-runbook.md#monitoring"
+          }
+        },
+        {
+          "alert": "RuntimeBudgetUnknown",
+          "expr": "runtime_budget_data_available == 0",
+          "for": "2m",
+          "labels": {
+            "severity": "warning"
+          },
+          "annotations": {
+            "summary": "Current measured billing evidence is missing, stale or invalid. Spending is unknown.",
+            "runbook_url": "../docs/monitoring-runbook.md#budget"
+          }
+        },
+        {
+          "alert": "RuntimeBudgetWarning",
+          "expr": "runtime_budget_spent_ratio >= 0.8 and runtime_budget_spent_ratio < 1",
+          "for": "2m",
+          "labels": {
+            "severity": "warning"
+          },
+          "annotations": {
+            "summary": "Measured spend has reached 80 percent of its explicit period budget.",
+            "runbook_url": "../docs/monitoring-runbook.md#budget"
+          }
+        },
+        {
+          "alert": "RuntimeBudgetExceeded",
+          "expr": "runtime_budget_spent_ratio >= 1",
+          "for": "2m",
+          "labels": {
+            "severity": "critical"
+          },
+          "annotations": {
+            "summary": "Measured spend has reached its explicit period budget.",
+            "runbook_url": "../docs/monitoring-runbook.md#budget"
+          }
+        }
+      ]
+    }
+  ]
+}

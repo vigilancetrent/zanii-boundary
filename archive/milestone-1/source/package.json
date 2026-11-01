@@ -1,0 +1,21 @@
+{
+  "name": "agent-runtime-research",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Synthetic local experiments for agent authorization under deployment drift; not production protection.",
+  "engines": { "node": ">=24" },
+  "scripts": {
+    "test": "node --test --test-isolation=none test/*.test.mjs",
+    "test:isolated": "node --test test/*.test.mjs",
+    "benchmark": "node scripts/benchmark.mjs --transport=in-process",
+    "benchmark:process": "node scripts/benchmark.mjs --transport=process",
+    "verify": "node scripts/verify.mjs",
+    "load": "node scripts/load.mjs --transport=in-process",
+    "load:process": "node scripts/load.mjs --transport=process"
+  },
+  "exports": {
+    "./client": "./src/client.mjs",
+    "./evidence": "./src/evidence.mjs"
+  }
+}

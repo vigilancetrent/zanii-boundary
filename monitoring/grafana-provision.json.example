@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "root": "..",
+  "caFile": "../.secrets/monitoring/grafana/ca.pem",
+  "certFile": "../.secrets/monitoring/grafana/client-cert.pem",
+  "keyFile": "../.secrets/monitoring/grafana/client-key.pem",
+  "output": "../.secrets/monitoring/private/grafana-datasources.yaml"
+}

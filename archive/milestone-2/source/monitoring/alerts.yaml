@@ -1,0 +1,27 @@
+groups:
+  - name: agent-runtime
+    rules:
+      - alert: RuntimeScrapeUnavailable
+        expr: up{job="agent-runtime"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: Runtime metrics cannot be scraped
+          runbook: docs/product-runbook.md#runtime-unavailable
+      - alert: RuntimeRequestFailureRatio
+        expr: rate(runtime_denied_total[5m]) / clamp_min(rate(runtime_requests_total[5m]), 0.001) > 0.2
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: More than 20 percent of admitted requests return a denial or error
+          runbook: docs/product-runbook.md#denials-and-provider-failures
+      - alert: RuntimeAdmissionSaturation
+        expr: runtime_active >= 16
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: Example 16-request concurrency budget remains occupied
+          runbook: docs/product-runbook.md#admission-saturation

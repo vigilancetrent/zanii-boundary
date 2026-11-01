@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "socketPath": "/run/runtime/gateway.sock",
+  "target": {
+    "host": "gateway",
+    "port": 8443
+  },
+  "connectTimeoutMs": 1000,
+  "idleTimeoutMs": 15000,
+  "lifetimeMs": 30000,
+  "maxConnections": 256,
+  "maxBytes": 4194304
+}

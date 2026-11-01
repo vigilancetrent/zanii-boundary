@@ -1,0 +1,8 @@
+# Explicit nonstandard pip filename; otherwise Trivy silently skips the CI lock.
+scan:
+  file-patterns:
+    - 'pip:requirements-ci\.txt'
+  skip-version-check: true
+pkg:
+  include-dev-deps: true
+timeout: 2m

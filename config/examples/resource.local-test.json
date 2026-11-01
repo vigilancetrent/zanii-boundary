@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "role": "resource",
+  "profile": "local-test",
+  "listen": { "host": "127.0.0.1", "port": 8444 },
+  "tls": { "certFile": "../../artifacts/test-pki-resource-cert.pem", "keyFile": "../../artifacts/test-pki-resource-key.pem", "caFile": "../../artifacts/test-pki-ca.pem", "requireClientCertificate": true },
+  "auth": { "issuer": "https://broker.local", "audience": "resource", "jwksFile": "../../artifacts/test-pki-broker-public.jwks.json", "algorithms": ["EdDSA"], "requireSenderBinding": true, "maxLifetimeSeconds": 900 },
+  "storage": { "path": "../../.local-data/resource.sqlite", "encryptionKeyFile": "../../artifacts/test-pki-resource-data.key", "auditKeyFile": "../../artifacts/test-pki-resource-audit.key", "retentionMs": 604800000 },
+  "signing": { "privateKeyFile": "../../artifacts/test-pki-resource-signing-key.pem" },
+  "limits": { "bodyBytes": 65536, "requestTimeoutMs": 10000, "rateWindowMs": 60000, "rateRequests": 300, "maxConcurrency": 32 },
+  "integrations": { "documents": { "toolVersion": "documents-v1", "maxContentBytes": 32768, "internalRecipients": ["internal-team"] } },
+  "protocols": {}
+}

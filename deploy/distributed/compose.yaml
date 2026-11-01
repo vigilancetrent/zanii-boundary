@@ -1,0 +1,1163 @@
+{
+  "name": "agent-runtime-distributed",
+  "services": {
+    "agent": {
+      "image": "${RUNTIME_IMAGE:?Set a verified digest-pinned product image}",
+      "user": "10003:2000",
+      "entrypoint": [
+        "node"
+      ],
+      "read_only": true,
+      "cap_drop": [
+        "ALL"
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "pids_limit": 64,
+      "mem_limit": "256m",
+      "cpus": 0.5,
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,size=16m,mode=1770,uid=10003,gid=2000"
+      ],
+      "environment": {
+        "NODE_ENV": "production"
+      },
+      "stop_grace_period": "10s",
+      "network_mode": "none",
+      "stdin_open": true,
+      "command": [
+        "scripts/agent-runner.mjs",
+        "--socket",
+        "/run/runtime/gateway.sock",
+        "--token-file",
+        "/run/identity/agent.jwt",
+        "--cert-file",
+        "/run/identity/agent-cert.pem",
+        "--key-file",
+        "/run/identity/agent-key.pem",
+        "--ca-file",
+        "/run/identity/ca.pem"
+      ],
+      "volumes": [
+        {
+          "type": "bind",
+          "source": "${RUNTIME_SOCKET_DIR:?}",
+          "target": "/run/runtime",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "${RUNTIME_AGENT_IDENTITY_DIR:?}",
+          "target": "/run/identity",
+          "read_only": true
+        }
+      ]
+    },
+    "relay": {
+      "image": "${RUNTIME_IMAGE:?Set a verified digest-pinned product image}",
+      "user": "10004:2000",
+      "entrypoint": [
+        "node"
+      ],
+      "read_only": true,
+      "cap_drop": [
+        "ALL"
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "pids_limit": 128,
+      "mem_limit": "512m",
+      "cpus": 1,
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,size=16m,mode=1770,uid=10004,gid=2000"
+      ],
+      "environment": {
+        "NODE_ENV": "production"
+      },
+      "stop_grace_period": "30s",
+      "command": [
+        "scripts/relay.mjs",
+        "--config",
+        "/run/config/relay.json"
+      ],
+      "networks": [
+        "ingress"
+      ],
+      "volumes": [
+        {
+          "type": "bind",
+          "source": "${RUNTIME_CONFIG_DIR:?}/relay.json",
+          "target": "/run/config/relay.json",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "${RUNTIME_SOCKET_DIR:?}",
+          "target": "/run/runtime",
+          "read_only": false
+        }
+      ]
+    },
+    "gateway": {
+      "image": "${RUNTIME_IMAGE:?Set a verified digest-pinned product image}",
+      "user": "10001:2000",
+      "entrypoint": [
+        "node"
+      ],
+      "read_only": true,
+      "cap_drop": [
+        "ALL"
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "pids_limit": 128,
+      "mem_limit": "512m",
+      "cpus": 1,
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,size=16m,mode=1770,uid=10001,gid=2000"
+      ],
+      "environment": {
+        "NODE_ENV": "production"
+      },
+      "stop_grace_period": "30s",
+      "command": [
+        "scripts/start.mjs",
+        "--config",
+        "/run/config/gateway.json"
+      ],
+      "networks": [
+        "ingress",
+        "runtime",
+        "providers",
+        "monitoring"
+      ],
+      "volumes": [
+        {
+          "type": "bind",
+          "source": "${RUNTIME_CONFIG_DIR:?}/gateway.json",
+          "target": "/run/config/gateway.json",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "${RUNTIME_TRUST_DIR:?}",
+          "target": "/run/trust",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "${RUNTIME_STATE_DIR:?}/gateway/logs",
+          "target": "/var/log/runtime",
+          "read_only": false
+        }
+      ],
+      "secrets": [
+        "gateway_tls_key",
+        "gateway_tls_cert",
+        "gateway_data_key",
+        "gateway_audit_key",
+        "gateway_keyring",
+        "gateway_signing_key",
+        "gateway_containment_receipt",
+        "gateway_postgres_credentials",
+        "gateway_otel_cert",
+        "gateway_otel_key"
+      ],
+      "deploy": {
+        "replicas": 2
+      }
+    },
+    "resource": {
+      "image": "${RUNTIME_IMAGE:?Set a verified digest-pinned product image}",
+      "user": "10002:2000",
+      "entrypoint": [
+        "node"
+      ],
+      "read_only": true,
+      "cap_drop": [
+        "ALL"
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "pids_limit": 128,
+      "mem_limit": "512m",
+      "cpus": 1,
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,size=16m,mode=1770,uid=10002,gid=2000"
+      ],
+      "environment": {
+        "NODE_ENV": "production"
+      },
+      "stop_grace_period": "30s",
+      "command": [
+        "scripts/start.mjs",
+        "--config",
+        "/run/config/resource.json"
+      ],
+      "networks": [
+        "runtime",
+        "providers",
+        "monitoring"
+      ],
+      "volumes": [
+        {
+          "type": "bind",
+          "source": "${RUNTIME_CONFIG_DIR:?}/resource.json",
+          "target": "/run/config/resource.json",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "${RUNTIME_TRUST_DIR:?}",
+          "target": "/run/trust",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "${RUNTIME_STATE_DIR:?}/resource/logs",
+          "target": "/var/log/runtime",
+          "read_only": false
+        }
+      ],
+      "secrets": [
+        "resource_tls_key",
+        "resource_tls_cert",
+        "resource_data_key",
+        "resource_audit_key",
+        "resource_keyring",
+        "resource_signing_key",
+        "resource_containment_receipt",
+        "resource_postgres_credentials",
+        "resource_objects_credentials",
+        "resource_objects_index_key",
+        "resource_objects_data_key",
+        "resource_otel_cert",
+        "resource_otel_key"
+      ],
+      "deploy": {
+        "replicas": 2
+      }
+    },
+    "worker-gateway": {
+      "image": "${RUNTIME_IMAGE:?Set a verified digest-pinned product image}",
+      "user": "10011:2000",
+      "entrypoint": [
+        "node"
+      ],
+      "read_only": true,
+      "cap_drop": [
+        "ALL"
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "pids_limit": 128,
+      "mem_limit": "512m",
+      "cpus": 1,
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,size=16m,mode=1770,uid=10011,gid=2000"
+      ],
+      "environment": {
+        "NODE_ENV": "production"
+      },
+      "stop_grace_period": "30s",
+      "command": [
+        "scripts/worker.mjs",
+        "/run/config/worker-gateway.json"
+      ],
+      "networks": [
+        "runtime",
+        "providers",
+        "monitoring"
+      ],
+      "volumes": [
+        {
+          "type": "bind",
+          "source": "${RUNTIME_CONFIG_DIR:?}/worker-gateway.json",
+          "target": "/run/config/worker-gateway.json",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "${RUNTIME_TRUST_DIR:?}",
+          "target": "/run/trust",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "${RUNTIME_STATE_DIR:?}/worker-gateway/logs",
+          "target": "/var/log/runtime",
+          "read_only": false
+        }
+      ],
+      "secrets": [
+        "worker_gateway_postgres_credentials",
+        "worker_gateway_data_key",
+        "worker_gateway_audit_key",
+        "worker_gateway_keyring",
+        "worker_gateway_otel_cert",
+        "worker_gateway_otel_key"
+      ],
+      "deploy": {
+        "replicas": 1
+      }
+    },
+    "worker-resource": {
+      "image": "${RUNTIME_IMAGE:?Set a verified digest-pinned product image}",
+      "user": "10012:2000",
+      "entrypoint": [
+        "node"
+      ],
+      "read_only": true,
+      "cap_drop": [
+        "ALL"
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "pids_limit": 128,
+      "mem_limit": "512m",
+      "cpus": 1,
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,size=16m,mode=1770,uid=10012,gid=2000"
+      ],
+      "environment": {
+        "NODE_ENV": "production"
+      },
+      "stop_grace_period": "30s",
+      "command": [
+        "scripts/worker.mjs",
+        "/run/config/worker-resource.json"
+      ],
+      "networks": [
+        "runtime",
+        "providers",
+        "monitoring"
+      ],
+      "volumes": [
+        {
+          "type": "bind",
+          "source": "${RUNTIME_CONFIG_DIR:?}/worker-resource.json",
+          "target": "/run/config/worker-resource.json",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "${RUNTIME_TRUST_DIR:?}",
+          "target": "/run/trust",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "${RUNTIME_STATE_DIR:?}/worker-resource/logs",
+          "target": "/var/log/runtime",
+          "read_only": false
+        }
+      ],
+      "secrets": [
+        "worker_resource_postgres_credentials",
+        "worker_resource_data_key",
+        "worker_resource_audit_key",
+        "worker_resource_keyring",
+        "worker_resource_objects_credentials",
+        "worker_resource_objects_index_key",
+        "worker_resource_objects_data_key",
+        "worker_resource_otel_cert",
+        "worker_resource_otel_key"
+      ],
+      "deploy": {
+        "replicas": 1
+      }
+    },
+    "archive-gateway": {
+      "image": "${RUNTIME_IMAGE:?Set a verified digest-pinned product image}",
+      "user": "10021:2000",
+      "entrypoint": [
+        "node"
+      ],
+      "read_only": true,
+      "cap_drop": [
+        "ALL"
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "pids_limit": 128,
+      "mem_limit": "512m",
+      "cpus": 1,
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,size=16m,mode=1770,uid=10021,gid=2000"
+      ],
+      "environment": {
+        "NODE_ENV": "production"
+      },
+      "stop_grace_period": "30s",
+      "command": [
+        "scripts/worker.mjs",
+        "/run/config/archive-gateway.json"
+      ],
+      "networks": [
+        "runtime",
+        "providers",
+        "monitoring"
+      ],
+      "volumes": [
+        {
+          "type": "bind",
+          "source": "${RUNTIME_CONFIG_DIR:?}/archive-gateway.json",
+          "target": "/run/config/archive-gateway.json",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "${RUNTIME_TRUST_DIR:?}",
+          "target": "/run/trust",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "${RUNTIME_STATE_DIR:?}/archive-gateway/logs",
+          "target": "/var/log/runtime",
+          "read_only": false
+        }
+      ],
+      "secrets": [
+        "archive_gateway_postgres_credentials",
+        "archive_gateway_objects_credentials",
+        "archive_gateway_objects_index_key",
+        "archive_gateway_objects_data_key",
+        "archive_gateway_archive_signing_key",
+        "archive_gateway_otel_cert",
+        "archive_gateway_otel_key"
+      ],
+      "deploy": {
+        "replicas": 1
+      }
+    },
+    "archive-resource": {
+      "image": "${RUNTIME_IMAGE:?Set a verified digest-pinned product image}",
+      "user": "10022:2000",
+      "entrypoint": [
+        "node"
+      ],
+      "read_only": true,
+      "cap_drop": [
+        "ALL"
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "pids_limit": 128,
+      "mem_limit": "512m",
+      "cpus": 1,
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,size=16m,mode=1770,uid=10022,gid=2000"
+      ],
+      "environment": {
+        "NODE_ENV": "production"
+      },
+      "stop_grace_period": "30s",
+      "command": [
+        "scripts/worker.mjs",
+        "/run/config/archive-resource.json"
+      ],
+      "networks": [
+        "runtime",
+        "providers",
+        "monitoring"
+      ],
+      "volumes": [
+        {
+          "type": "bind",
+          "source": "${RUNTIME_CONFIG_DIR:?}/archive-resource.json",
+          "target": "/run/config/archive-resource.json",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "${RUNTIME_TRUST_DIR:?}",
+          "target": "/run/trust",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "${RUNTIME_STATE_DIR:?}/archive-resource/logs",
+          "target": "/var/log/runtime",
+          "read_only": false
+        }
+      ],
+      "secrets": [
+        "archive_resource_postgres_credentials",
+        "archive_resource_objects_credentials",
+        "archive_resource_objects_index_key",
+        "archive_resource_objects_data_key",
+        "archive_resource_archive_signing_key",
+        "archive_resource_otel_cert",
+        "archive_resource_otel_key"
+      ],
+      "deploy": {
+        "replicas": 1
+      }
+    },
+    "backup-gateway": {
+      "image": "${RUNTIME_IMAGE:?Set a verified digest-pinned product image}",
+      "user": "10031:2000",
+      "entrypoint": [
+        "node"
+      ],
+      "read_only": true,
+      "cap_drop": [
+        "ALL"
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "pids_limit": 128,
+      "mem_limit": "2g",
+      "cpus": 1,
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,size=16m,mode=1770,uid=10031,gid=2000"
+      ],
+      "environment": {
+        "NODE_ENV": "production"
+      },
+      "stop_grace_period": "30s",
+      "command": [
+        "scripts/worker.mjs",
+        "/run/config/backup-gateway.json"
+      ],
+      "networks": [
+        "runtime",
+        "providers",
+        "monitoring"
+      ],
+      "volumes": [
+        {
+          "type": "bind",
+          "source": "${RUNTIME_CONFIG_DIR:?}/backup-gateway.json",
+          "target": "/run/config/backup-gateway.json",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "${RUNTIME_TRUST_DIR:?}",
+          "target": "/run/trust",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "${RUNTIME_STATE_DIR:?}/backup-gateway/logs",
+          "target": "/var/log/runtime",
+          "read_only": false
+        },
+        {
+          "type": "bind",
+          "source": "${RUNTIME_STATE_DIR:?}/backup-gateway/spool",
+          "target": "/var/lib/runtime-backup",
+          "read_only": false
+        }
+      ],
+      "secrets": [
+        "backup_gateway_postgres_credentials",
+        "backup_gateway_otel_cert",
+        "backup_gateway_otel_key",
+        "backup_gateway_objects_credentials",
+        "backup_gateway_objects_index_key",
+        "backup_gateway_objects_data_key",
+        "backup_gateway_backup_signing_key",
+        "backup_gateway_spool_key"
+      ],
+      "deploy": {
+        "replicas": 1
+      }
+    },
+    "backup-resource": {
+      "image": "${RUNTIME_IMAGE:?Set a verified digest-pinned product image}",
+      "user": "10032:2000",
+      "entrypoint": [
+        "node"
+      ],
+      "read_only": true,
+      "cap_drop": [
+        "ALL"
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "pids_limit": 128,
+      "mem_limit": "2g",
+      "cpus": 1,
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,size=16m,mode=1770,uid=10032,gid=2000"
+      ],
+      "environment": {
+        "NODE_ENV": "production"
+      },
+      "stop_grace_period": "30s",
+      "command": [
+        "scripts/worker.mjs",
+        "/run/config/backup-resource.json"
+      ],
+      "networks": [
+        "runtime",
+        "providers",
+        "monitoring"
+      ],
+      "volumes": [
+        {
+          "type": "bind",
+          "source": "${RUNTIME_CONFIG_DIR:?}/backup-resource.json",
+          "target": "/run/config/backup-resource.json",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "${RUNTIME_TRUST_DIR:?}",
+          "target": "/run/trust",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "${RUNTIME_STATE_DIR:?}/backup-resource/logs",
+          "target": "/var/log/runtime",
+          "read_only": false
+        },
+        {
+          "type": "bind",
+          "source": "${RUNTIME_STATE_DIR:?}/backup-resource/spool",
+          "target": "/var/lib/runtime-backup",
+          "read_only": false
+        }
+      ],
+      "secrets": [
+        "backup_resource_postgres_credentials",
+        "backup_resource_otel_cert",
+        "backup_resource_otel_key",
+        "backup_resource_objects_credentials",
+        "backup_resource_objects_index_key",
+        "backup_resource_objects_data_key",
+        "backup_resource_backup_signing_key",
+        "backup_resource_spool_key"
+      ],
+      "deploy": {
+        "replicas": 1
+      }
+    },
+    "rotator-gateway": {
+      "image": "${RUNTIME_IMAGE:?Set a verified digest-pinned product image}",
+      "user": "10041:2000",
+      "entrypoint": [
+        "node"
+      ],
+      "read_only": true,
+      "cap_drop": [
+        "ALL"
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "pids_limit": 128,
+      "mem_limit": "512m",
+      "cpus": 1,
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,size=16m,mode=1770,uid=10041,gid=2000"
+      ],
+      "environment": {
+        "NODE_ENV": "production"
+      },
+      "stop_grace_period": "30s",
+      "command": [
+        "scripts/key-rotation.mjs",
+        "drain-status",
+        "--config",
+        "/run/config/rotator-gateway.json"
+      ],
+      "networks": [
+        "runtime",
+        "providers",
+        "monitoring"
+      ],
+      "volumes": [
+        {
+          "type": "bind",
+          "source": "${RUNTIME_CONFIG_DIR:?}/rotator-gateway.json",
+          "target": "/run/config/rotator-gateway.json",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "${RUNTIME_TRUST_DIR:?}",
+          "target": "/run/trust",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "${RUNTIME_STATE_DIR:?}/rotator-gateway/logs",
+          "target": "/var/log/runtime",
+          "read_only": false
+        }
+      ],
+      "secrets": [
+        "rotator_gateway_postgres_credentials",
+        "rotator_gateway_data_key",
+        "rotator_gateway_audit_key",
+        "rotator_gateway_keyring"
+      ],
+      "deploy": {
+        "replicas": 1
+      },
+      "profiles": [
+        "maintenance"
+      ]
+    },
+    "rotator-resource": {
+      "image": "${RUNTIME_IMAGE:?Set a verified digest-pinned product image}",
+      "user": "10042:2000",
+      "entrypoint": [
+        "node"
+      ],
+      "read_only": true,
+      "cap_drop": [
+        "ALL"
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "pids_limit": 128,
+      "mem_limit": "512m",
+      "cpus": 1,
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,size=16m,mode=1770,uid=10042,gid=2000"
+      ],
+      "environment": {
+        "NODE_ENV": "production"
+      },
+      "stop_grace_period": "30s",
+      "command": [
+        "scripts/key-rotation.mjs",
+        "drain-status",
+        "--config",
+        "/run/config/rotator-resource.json"
+      ],
+      "networks": [
+        "runtime",
+        "providers",
+        "monitoring"
+      ],
+      "volumes": [
+        {
+          "type": "bind",
+          "source": "${RUNTIME_CONFIG_DIR:?}/rotator-resource.json",
+          "target": "/run/config/rotator-resource.json",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "${RUNTIME_TRUST_DIR:?}",
+          "target": "/run/trust",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "${RUNTIME_STATE_DIR:?}/rotator-resource/logs",
+          "target": "/var/log/runtime",
+          "read_only": false
+        }
+      ],
+      "secrets": [
+        "rotator_resource_postgres_credentials",
+        "rotator_resource_data_key",
+        "rotator_resource_audit_key",
+        "rotator_resource_keyring"
+      ],
+      "deploy": {
+        "replicas": 1
+      },
+      "profiles": [
+        "maintenance"
+      ]
+    },
+    "migrator-gateway": {
+      "image": "${RUNTIME_IMAGE:?Set a verified digest-pinned product image}",
+      "user": "10051:2000",
+      "entrypoint": [
+        "node"
+      ],
+      "read_only": true,
+      "cap_drop": [
+        "ALL"
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "pids_limit": 128,
+      "mem_limit": "512m",
+      "cpus": 1,
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,size=16m,mode=1770,uid=10051,gid=2000"
+      ],
+      "environment": {
+        "NODE_ENV": "production"
+      },
+      "stop_grace_period": "30s",
+      "command": [
+        "scripts/migrate.mjs",
+        "/run/config/migrator-gateway.json",
+        "up"
+      ],
+      "networks": [
+        "runtime",
+        "providers",
+        "monitoring"
+      ],
+      "volumes": [
+        {
+          "type": "bind",
+          "source": "${RUNTIME_CONFIG_DIR:?}/migrator-gateway.json",
+          "target": "/run/config/migrator-gateway.json",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "${RUNTIME_TRUST_DIR:?}",
+          "target": "/run/trust",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "${RUNTIME_STATE_DIR:?}/migrator-gateway/logs",
+          "target": "/var/log/runtime",
+          "read_only": false
+        }
+      ],
+      "secrets": [
+        "migrator_gateway_postgres_credentials"
+      ],
+      "deploy": {
+        "replicas": 1
+      },
+      "profiles": [
+        "maintenance"
+      ]
+    },
+    "migrator-resource": {
+      "image": "${RUNTIME_IMAGE:?Set a verified digest-pinned product image}",
+      "user": "10052:2000",
+      "entrypoint": [
+        "node"
+      ],
+      "read_only": true,
+      "cap_drop": [
+        "ALL"
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "pids_limit": 128,
+      "mem_limit": "512m",
+      "cpus": 1,
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,size=16m,mode=1770,uid=10052,gid=2000"
+      ],
+      "environment": {
+        "NODE_ENV": "production"
+      },
+      "stop_grace_period": "30s",
+      "command": [
+        "scripts/migrate.mjs",
+        "/run/config/migrator-resource.json",
+        "up"
+      ],
+      "networks": [
+        "runtime",
+        "providers",
+        "monitoring"
+      ],
+      "volumes": [
+        {
+          "type": "bind",
+          "source": "${RUNTIME_CONFIG_DIR:?}/migrator-resource.json",
+          "target": "/run/config/migrator-resource.json",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "${RUNTIME_TRUST_DIR:?}",
+          "target": "/run/trust",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "${RUNTIME_STATE_DIR:?}/migrator-resource/logs",
+          "target": "/var/log/runtime",
+          "read_only": false
+        }
+      ],
+      "secrets": [
+        "migrator_resource_postgres_credentials"
+      ],
+      "deploy": {
+        "replicas": 1
+      },
+      "profiles": [
+        "maintenance"
+      ]
+    }
+  },
+  "networks": {
+    "ingress": {
+      "internal": true
+    },
+    "runtime": {
+      "internal": true
+    },
+    "providers": {
+      "external": true,
+      "name": "${RUNTIME_PROVIDER_NETWORK:?}"
+    },
+    "monitoring": {
+      "external": true,
+      "name": "${RUNTIME_MONITORING_NETWORK:?}"
+    }
+  },
+  "secrets": {
+    "gateway_tls_key": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/gateway/tls_key"
+    },
+    "gateway_tls_cert": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/gateway/tls_cert"
+    },
+    "gateway_data_key": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/gateway/data_key"
+    },
+    "gateway_audit_key": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/gateway/audit_key"
+    },
+    "gateway_keyring": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/gateway/keyring"
+    },
+    "gateway_signing_key": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/gateway/signing_key"
+    },
+    "gateway_containment_receipt": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/gateway/containment_receipt"
+    },
+    "gateway_postgres_credentials": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/gateway/postgres_credentials"
+    },
+    "gateway_otel_cert": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/gateway/otel_cert"
+    },
+    "gateway_otel_key": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/gateway/otel_key"
+    },
+    "resource_tls_key": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/resource/tls_key"
+    },
+    "resource_tls_cert": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/resource/tls_cert"
+    },
+    "resource_data_key": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/resource/data_key"
+    },
+    "resource_audit_key": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/resource/audit_key"
+    },
+    "resource_keyring": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/resource/keyring"
+    },
+    "resource_signing_key": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/resource/signing_key"
+    },
+    "resource_containment_receipt": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/resource/containment_receipt"
+    },
+    "resource_postgres_credentials": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/resource/postgres_credentials"
+    },
+    "resource_objects_credentials": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/resource/objects_credentials"
+    },
+    "resource_objects_index_key": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/resource/objects_index_key"
+    },
+    "resource_objects_data_key": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/resource/objects_data_key"
+    },
+    "resource_otel_cert": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/resource/otel_cert"
+    },
+    "resource_otel_key": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/resource/otel_key"
+    },
+    "worker_gateway_postgres_credentials": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/worker-gateway/postgres_credentials"
+    },
+    "worker_gateway_data_key": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/worker-gateway/data_key"
+    },
+    "worker_gateway_audit_key": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/worker-gateway/audit_key"
+    },
+    "worker_gateway_keyring": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/worker-gateway/keyring"
+    },
+    "worker_gateway_otel_cert": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/worker-gateway/otel_cert"
+    },
+    "worker_gateway_otel_key": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/worker-gateway/otel_key"
+    },
+    "worker_resource_postgres_credentials": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/worker-resource/postgres_credentials"
+    },
+    "worker_resource_data_key": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/worker-resource/data_key"
+    },
+    "worker_resource_audit_key": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/worker-resource/audit_key"
+    },
+    "worker_resource_keyring": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/worker-resource/keyring"
+    },
+    "worker_resource_objects_credentials": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/worker-resource/objects_credentials"
+    },
+    "worker_resource_objects_index_key": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/worker-resource/objects_index_key"
+    },
+    "worker_resource_objects_data_key": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/worker-resource/objects_data_key"
+    },
+    "worker_resource_otel_cert": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/worker-resource/otel_cert"
+    },
+    "worker_resource_otel_key": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/worker-resource/otel_key"
+    },
+    "archive_gateway_postgres_credentials": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/archive-gateway/postgres_credentials"
+    },
+    "archive_gateway_objects_credentials": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/archive-gateway/objects_credentials"
+    },
+    "archive_gateway_objects_index_key": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/archive-gateway/objects_index_key"
+    },
+    "archive_gateway_objects_data_key": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/archive-gateway/objects_data_key"
+    },
+    "archive_gateway_archive_signing_key": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/archive-gateway/archive_signing_key"
+    },
+    "archive_gateway_otel_cert": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/archive-gateway/otel_cert"
+    },
+    "archive_gateway_otel_key": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/archive-gateway/otel_key"
+    },
+    "archive_resource_postgres_credentials": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/archive-resource/postgres_credentials"
+    },
+    "archive_resource_objects_credentials": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/archive-resource/objects_credentials"
+    },
+    "archive_resource_objects_index_key": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/archive-resource/objects_index_key"
+    },
+    "archive_resource_objects_data_key": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/archive-resource/objects_data_key"
+    },
+    "archive_resource_archive_signing_key": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/archive-resource/archive_signing_key"
+    },
+    "archive_resource_otel_cert": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/archive-resource/otel_cert"
+    },
+    "archive_resource_otel_key": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/archive-resource/otel_key"
+    },
+    "backup_gateway_postgres_credentials": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/backup-gateway/postgres_credentials"
+    },
+    "backup_gateway_otel_cert": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/backup-gateway/otel_cert"
+    },
+    "backup_gateway_otel_key": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/backup-gateway/otel_key"
+    },
+    "backup_gateway_objects_credentials": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/backup-gateway/objects_credentials"
+    },
+    "backup_gateway_objects_index_key": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/backup-gateway/objects_index_key"
+    },
+    "backup_gateway_objects_data_key": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/backup-gateway/objects_data_key"
+    },
+    "backup_gateway_backup_signing_key": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/backup-gateway/backup_signing_key"
+    },
+    "backup_gateway_spool_key": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/backup-gateway/spool_key"
+    },
+    "backup_resource_postgres_credentials": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/backup-resource/postgres_credentials"
+    },
+    "backup_resource_otel_cert": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/backup-resource/otel_cert"
+    },
+    "backup_resource_otel_key": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/backup-resource/otel_key"
+    },
+    "backup_resource_objects_credentials": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/backup-resource/objects_credentials"
+    },
+    "backup_resource_objects_index_key": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/backup-resource/objects_index_key"
+    },
+    "backup_resource_objects_data_key": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/backup-resource/objects_data_key"
+    },
+    "backup_resource_backup_signing_key": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/backup-resource/backup_signing_key"
+    },
+    "backup_resource_spool_key": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/backup-resource/spool_key"
+    },
+    "rotator_gateway_postgres_credentials": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/rotator-gateway/postgres_credentials"
+    },
+    "rotator_gateway_data_key": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/rotator-gateway/data_key"
+    },
+    "rotator_gateway_audit_key": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/rotator-gateway/audit_key"
+    },
+    "rotator_gateway_keyring": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/rotator-gateway/keyring"
+    },
+    "rotator_resource_postgres_credentials": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/rotator-resource/postgres_credentials"
+    },
+    "rotator_resource_data_key": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/rotator-resource/data_key"
+    },
+    "rotator_resource_audit_key": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/rotator-resource/audit_key"
+    },
+    "rotator_resource_keyring": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/rotator-resource/keyring"
+    },
+    "migrator_gateway_postgres_credentials": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/migrator-gateway/postgres_credentials"
+    },
+    "migrator_resource_postgres_credentials": {
+      "file": "${RUNTIME_SECRETS_DIR:?}/migrator-resource/postgres_credentials"
+    }
+  }
+}

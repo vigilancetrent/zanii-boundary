@@ -1,0 +1,74 @@
+{
+  "name": "@zanii/boundary",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Company agent execution boundary with durable authorization, TLS resource adapters, controlled learning and reproducible local evaluation; deployment acceptance required.",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "test": "node --test --test-isolation=none test/*.test.mjs",
+    "test:isolated": "node --test test/*.test.mjs",
+    "benchmark": "node scripts/benchmark.mjs --transport=in-process",
+    "benchmark:process": "node scripts/benchmark.mjs --transport=process",
+    "verify": "node scripts/verify.mjs",
+    "load": "node scripts/load.mjs --transport=in-process",
+    "load:process": "node scripts/load.mjs --transport=process",
+    "start": "node scripts/start.mjs",
+    "product:evaluate": "node scripts/product-evaluate.mjs",
+    "product:load": "node scripts/product-load.mjs",
+    "product:check": "node --experimental-vm-modules scripts/product-check.mjs",
+    "product:lint": "node scripts/product-tooling.mjs lint",
+    "product:typecheck": "node scripts/product-tooling.mjs typecheck",
+    "product:verify": "node scripts/product-verify.mjs",
+    "product:doctor": "node scripts/doctor.mjs",
+    "product:operations": "node scripts/operations.mjs",
+    "product:operations-check": "node scripts/operations-check.mjs",
+    "product:socket-acceptance": "node --test --test-isolation=none test/acceptance-product-socket.mjs",
+    "product:security": "node scripts/security-report.mjs report",
+    "product:delivery-policy": "node scripts/security-report.mjs policy"
+  },
+  "exports": {
+    ".": "./src/product/client.mjs",
+    "./client": "./src/product/client.mjs",
+    "./evidence": "./src/product/evidence.mjs",
+    "./research/client": "./src/client.mjs",
+    "./research/evidence": "./src/evidence.mjs",
+    "./product/client": "./src/product/client.mjs",
+    "./product/evidence": "./src/product/evidence.mjs",
+    "./product/server": "./src/product/server.mjs"
+  },
+  "dependencies": {
+    "@aws-sdk/client-kms": "3.1161.0",
+    "@aws-sdk/client-s3": "3.1161.0",
+    "@opentelemetry/api": "1.9.1",
+    "@opentelemetry/exporter-trace-otlp-http": "0.223.0",
+    "@opentelemetry/resources": "2.12.0",
+    "@opentelemetry/sdk-trace": "2.12.0",
+    "@prometheus-io/client": "0.16.1",
+    "@smithy/node-http-handler": "4.14.1",
+    "@zanii/broker": "0.1.0",
+    "@zanii/core": "0.5.6",
+    "@zanii/runtime": "0.4.0",
+    "@zanii/sdk": "0.5.4",
+    "canonicalize": "5.1.0",
+    "jose": "6.2.14",
+    "pg": "8.23.1",
+    "yaml": "2.9.1",
+    "zod": "4.6.7"
+  },
+  "overrides": {
+    "@zanii/runtime@0.4.0": {
+      "@zanii/sdk": "0.6.0"
+    }
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "0.5.13",
+    "@secretlint/secretlint-rule-preset-recommend": "13.1.0",
+    "@types/node": "26.6.6",
+    "eslint": "10.14.0",
+    "secretlint": "13.1.0",
+    "typescript": "6.0.3"
+  }
+}

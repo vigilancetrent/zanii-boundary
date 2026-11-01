@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "listen": {
+    "host": "0.0.0.0",
+    "port": 9464
+  },
+  "tls": {
+    "caFile": "/run/monitoring/probe-exporter/ca.pem",
+    "certFile": "/run/monitoring/probe-exporter/server-cert.pem",
+    "keyFile": "/run/monitoring/probe-exporter/server-key.pem"
+  },
+  "authorizationFile": "/run/monitoring/probe-exporter/prometheus.token",
+  "peers": [
+    "REPLACE_WITH_PROMETHEUS_CLIENT_CERT_SHA256_HEX"
+  ],
+  "timeoutMs": 8000,
+  "targets": [
+    {
+      "name": "gateway",
+      "maxReplicas": 4,
+      "probe": {
+        "version": 1,
+        "origin": "https://gateway:8443",
+        "servername": "gateway",
+        "caFile": "/run/monitoring/probe-exporter/ca.pem",
+        "certFile": "/run/monitoring/probe-exporter/gateway-cert.pem",
+        "keyFile": "/run/monitoring/probe-exporter/gateway-key.pem",
+        "tokenFile": "/run/monitoring/probe-exporter/gateway.jwt",
+        "audience": "company-agent-runtime",
+        "allowPrivateNetworks": true,
+        "maxLifetimeSeconds": 300,
+        "timeoutMs": 1000
+      }
+    },
+    {
+      "name": "resource",
+      "maxReplicas": 4,
+      "probe": {
+        "version": 1,
+        "origin": "https://resource:8444",
+        "servername": "resource",
+        "caFile": "/run/monitoring/probe-exporter/ca.pem",
+        "certFile": "/run/monitoring/probe-exporter/resource-cert.pem",
+        "keyFile": "/run/monitoring/probe-exporter/resource-key.pem",
+        "tokenFile": "/run/monitoring/probe-exporter/resource.jwt",
+        "audience": "company-document-resource",
+        "allowPrivateNetworks": true,
+        "maxLifetimeSeconds": 300,
+        "timeoutMs": 1000
+      }
+    }
+  ]
+}

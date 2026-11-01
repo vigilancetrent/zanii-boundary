@@ -1,0 +1,42 @@
+{
+  "global": {
+    "resolve_timeout": "5m"
+  },
+  "route": {
+    "receiver": "controlled-receiver",
+    "group_by": [
+      "alertname",
+      "realm",
+      "role"
+    ],
+    "group_wait": "5s",
+    "group_interval": "30s",
+    "repeat_interval": "4h"
+  },
+  "receivers": [
+    {
+      "name": "controlled-receiver",
+      "webhook_configs": [
+        {
+          "url": "https://monitoring-receiver:9444/v1/alerts/alertmanager",
+          "send_resolved": true,
+          "max_alerts": 64,
+          "http_config": {
+            "follow_redirects": false,
+            "tls_config": {
+              "ca_file": "/run/monitoring/alertmanager/ca.pem",
+              "cert_file": "/run/monitoring/alertmanager/client-cert.pem",
+              "key_file": "/run/monitoring/alertmanager/client-key.pem",
+              "min_version": "TLS13",
+              "server_name": "monitoring-receiver"
+            },
+            "authorization": {
+              "type": "Bearer",
+              "credentials_file": "/run/monitoring/alertmanager/receiver.token"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

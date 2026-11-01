@@ -1,0 +1,12 @@
+CREATE TABLE IF NOT EXISTS job_index(tenant TEXT NOT NULL,id TEXT NOT NULL,state TEXT NOT NULL,kind TEXT NOT NULL,due INTEGER NOT NULL,PRIMARY KEY(tenant,id)) STRICT;
+    CREATE INDEX IF NOT EXISTS job_index_due ON job_index(tenant,due,id) WHERE state IN ('queued','retry','running');
+    CREATE TABLE IF NOT EXISTS job_tombstones(tenant TEXT NOT NULL,id TEXT NOT NULL,record TEXT NOT NULL,mac TEXT NOT NULL,PRIMARY KEY(tenant,id)) STRICT;
+    CREATE TRIGGER IF NOT EXISTS jobs_index_cleanup AFTER DELETE ON objects WHEN OLD.namespace='jobs' BEGIN DELETE FROM job_index WHERE tenant=OLD.tenant AND id=OLD.id;END;
+    CREATE TABLE IF NOT EXISTS audit_bases(tenant TEXT PRIMARY KEY,sequence INTEGER NOT NULL,hash TEXT NOT NULL,reference TEXT NOT NULL,manifest TEXT NOT NULL) STRICT;
+    CREATE TABLE IF NOT EXISTS archive_segments(tenant TEXT NOT NULL,sequence INTEGER NOT NULL,reference TEXT NOT NULL,manifest TEXT NOT NULL,PRIMARY KEY(tenant,sequence)) STRICT;
+    CREATE TABLE IF NOT EXISTS archive_intents(tenant TEXT NOT NULL,id TEXT NOT NULL,record TEXT NOT NULL,PRIMARY KEY(tenant,id)) STRICT;
+    CREATE TABLE IF NOT EXISTS backup_catalogues(tenant TEXT NOT NULL,id TEXT NOT NULL,record TEXT NOT NULL,PRIMARY KEY(tenant,id)) STRICT;
+    CREATE TABLE IF NOT EXISTS maintenance_heartbeats(tenant TEXT NOT NULL,kind TEXT NOT NULL,id TEXT NOT NULL,record TEXT NOT NULL,PRIMARY KEY(tenant,kind,id)) STRICT;
+    CREATE TABLE IF NOT EXISTS tenants(tenant TEXT PRIMARY KEY) STRICT;
+    INSERT OR IGNORE INTO tenants SELECT tenant FROM objects UNION SELECT tenant FROM operations UNION SELECT tenant FROM audit UNION SELECT tenant FROM leases;
+    CREATE TABLE IF NOT EXISTS key_epochs(singleton INTEGER PRIMARY KEY CHECK(singleton=1),version INTEGER NOT NULL,active_id TEXT NOT NULL,frozen INTEGER NOT NULL) STRICT;

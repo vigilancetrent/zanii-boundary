@@ -1,0 +1,86 @@
+{
+  "version": 1,
+  "listen": {
+    "host": "0.0.0.0",
+    "port": 9444
+  },
+  "tls": {
+    "caFile": "/run/monitoring/receiver/ca.pem",
+    "certFile": "/run/monitoring/receiver/server-cert.pem",
+    "keyFile": "/run/monitoring/receiver/server-key.pem"
+  },
+  "peers": {
+    "alertmanager": [
+      "REPLACE_WITH_ALERTMANAGER_CLIENT_CERT_SHA256_HEX"
+    ],
+    "collector": [
+      "REPLACE_WITH_COLLECTOR_CLIENT_CERT_SHA256_HEX"
+    ],
+    "reader": [
+      "REPLACE_WITH_PROMETHEUS_CLIENT_CERT_SHA256_HEX",
+      "REPLACE_WITH_ACCEPTANCE_CLIENT_CERT_SHA256_HEX"
+    ]
+  },
+  "auth": {
+    "alertmanagerTokenFile": "/run/monitoring/receiver/alertmanager.token",
+    "readTokenFile": "/run/monitoring/receiver/read.token"
+  },
+  "storage": {
+    "path": "/var/lib/receiver/receipts.sqlite",
+    "encryptionKeyFile": "/run/monitoring/receiver/metadata-encryption.hex",
+    "auditKeyFile": "/run/monitoring/receiver/metadata-audit.hex",
+    "retentionMs": 86400000
+  },
+  "signing": {
+    "privateKeyFile": "/run/monitoring/receiver/receipt-signing.pem",
+    "publicKeyFile": "/run/monitoring/receiver/receipt-public.pem"
+  },
+  "deployment": {
+    "mode": "deployment",
+    "profileDigest": "REPLACE_WITH_ACTUAL_V2_PROFILE_DIGEST",
+    "runtimeImage": "REPLACE_WITH_VERIFIED_RUNTIME_DIGEST_REF",
+    "collectorImage": "REPLACE_WITH_VERIFIED_COLLECTOR_DIGEST_REF"
+  },
+  "serviceRoles": {
+    "runtime-gateway": "gateway",
+    "runtime-resource": "resource",
+    "runtime-worker-gateway": "worker",
+    "runtime-worker-resource": "worker",
+    "runtime-archive-gateway": "archive",
+    "runtime-archive-resource": "archive",
+    "runtime-backup-gateway": "backup",
+    "runtime-backup-resource": "backup"
+  },
+  "alertNames": [
+    "RuntimeScrapeUnavailable",
+    "RuntimeProbeFailed",
+    "RuntimeErrorRate",
+    "RuntimeLatency",
+    "RuntimeSaturation",
+    "RuntimeEventLoopDelay",
+    "RuntimeDatabasePoolWaiting",
+    "RuntimeDatabaseErrors",
+    "RuntimeDiskLow",
+    "RuntimeDiskMeasurementMissing",
+    "RuntimeRequiredMaintenanceUnavailable",
+    "RuntimeMaintenanceDeadLetters",
+    "RuntimeMaintenanceBacklog",
+    "RuntimeBackupCaptureStale",
+    "RuntimeBackupVerificationStale",
+    "RuntimeArchiveStale",
+    "RuntimeCertificateExpiring",
+    "RuntimeContainmentExpiring",
+    "RuntimeDependencyOpen",
+    "RuntimeUnknownAction",
+    "RuntimeLogSinkFailed",
+    "RuntimeLogsDropped",
+    "RuntimeTraceExportFailed",
+    "MonitoringCollectorExportFailed",
+    "MonitoringComponentUnavailable",
+    "MonitoringReceiverDenied",
+    "RuntimeBudgetUnknown",
+    "RuntimeBudgetWarning",
+    "RuntimeBudgetExceeded",
+    "RuntimeMonitoringAcceptance"
+  ]
+}

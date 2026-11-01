@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "type": "zanii-boundary.runtime-revocations",
+  "tenantId": "REPLACE_WITH_COMPANY_TENANT",
+  "agentDid": "REPLACE_WITH_DELEGATED_AGENT_DID_KEY",
+  "ownerDid": "REPLACE_WITH_PINNED_COMPANY_OWNER_DID_KEY",
+  "delegationDigest": "REPLACE_WITH_JCS_HASH_OF_EXACT_DELEGATION_CHAIN",
+  "revision": "REPLACE_WITH_MONOTONIC_POSITIVE_INTEGER",
+  "issuedAt": "REPLACE_WITH_CURRENT_EPOCH_MILLISECONDS",
+  "expiresAt": "REPLACE_WITH_SHORT_EXPIRY_EPOCH_MILLISECONDS",
+  "revoked": []
+}

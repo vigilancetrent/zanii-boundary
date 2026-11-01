@@ -1,0 +1,9 @@
+title = "Standalone runtime source history"
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Generated/private directories are not source-history inputs"
+paths = [
+  '''(^|/)(artifacts|archive|node_modules|__pycache__|\.git|\.npm-cache|\.cache|\.test-data|\.secrets)(/|$)'''
+]

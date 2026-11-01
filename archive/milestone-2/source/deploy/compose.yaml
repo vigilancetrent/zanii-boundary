@@ -1,0 +1,69 @@
+{
+  "name": "agent-runtime",
+  "services": {
+    "gateway": {
+      "image": "${RUNTIME_IMAGE:?Set a verified product image including @sha256 digest}",
+      "user": "10001:2000",
+      "command": ["--config", "/run/config/gateway.json"],
+      "read_only": true, "cap_drop": ["ALL"], "security_opt": ["no-new-privileges:true"],
+      "pids_limit": 128, "mem_limit": "512m", "cpus": 1,
+      "tmpfs": ["/tmp:rw,noexec,nosuid,size=16m,mode=1770"],
+      "networks": ["backend"],
+      "volumes": [
+        {"type": "bind", "source": "${RUNTIME_CONFIG_DIR:?}/gateway.json", "target": "/run/config/gateway.json", "read_only": true},
+        {"type": "bind", "source": "${RUNTIME_SOCKET_DIR:?}", "target": "/run/runtime"},
+        {"type": "bind", "source": "${RUNTIME_GATEWAY_DATA_DIR:?}", "target": "/var/lib/runtime"},
+        {"type": "bind", "source": "${RUNTIME_PKI_DIR:?}/ca.pem", "target": "/run/trust/ca.pem", "read_only": true},
+        {"type": "bind", "source": "${RUNTIME_PKI_DIR:?}/issuer-public.jwks.json", "target": "/run/trust/issuer.jwks.json", "read_only": true}
+      ],
+      "secrets": ["gateway_tls_key", "gateway_tls_cert", "gateway_data_key", "gateway_audit_key", "gateway_signing_key", "containment_receipt", "containment_trust"],
+      "environment": {"NODE_ENV": "production"},
+      "stop_grace_period": "30s"
+    },
+    "resource": {
+      "image": "${RUNTIME_IMAGE:?Set a verified product image including @sha256 digest}",
+      "user": "10002:2000", "command": ["--config", "/run/config/resource.json"],
+      "read_only": true, "cap_drop": ["ALL"], "security_opt": ["no-new-privileges:true"],
+      "pids_limit": 128, "mem_limit": "512m", "cpus": 1,
+      "tmpfs": ["/tmp:rw,noexec,nosuid,size=16m,mode=1770"],
+      "networks": ["backend"],
+      "volumes": [
+        {"type": "bind", "source": "${RUNTIME_CONFIG_DIR:?}/resource.json", "target": "/run/config/resource.json", "read_only": true},
+        {"type": "bind", "source": "${RUNTIME_RESOURCE_DATA_DIR:?}", "target": "/var/lib/runtime"},
+        {"type": "bind", "source": "${RUNTIME_DOCUMENT_DIR:?}", "target": "/var/lib/documents", "read_only": true},
+        {"type": "bind", "source": "${RUNTIME_PKI_DIR:?}/ca.pem", "target": "/run/trust/ca.pem", "read_only": true},
+        {"type": "bind", "source": "${RUNTIME_PKI_DIR:?}/broker-public.jwks.json", "target": "/run/trust/broker.jwks.json", "read_only": true}
+      ],
+      "secrets": ["resource_tls_key", "resource_tls_cert", "resource_data_key", "resource_audit_key", "resource_signing_key", "containment_receipt", "containment_trust"],
+      "environment": {"NODE_ENV": "production"}, "stop_grace_period": "30s"
+    },
+    "agent": {
+      "image": "${RUNTIME_IMAGE:?Set a verified product image including @sha256 digest}",
+      "user": "10003:2000", "network_mode": "none", "entrypoint": ["node"], "stdin_open": true,
+      "command": ["scripts/agent-runner.mjs", "--socket", "/run/runtime/gateway.sock", "--token-file", "/run/identity/agent.jwt", "--cert-file", "/run/identity/agent-cert.pem", "--key-file", "/run/identity/agent-key.pem", "--ca-file", "/run/identity/ca.pem"],
+      "read_only": true, "cap_drop": ["ALL"], "security_opt": ["no-new-privileges:true"],
+      "pids_limit": 64, "mem_limit": "256m", "cpus": 0.5,
+      "tmpfs": ["/tmp:rw,noexec,nosuid,size=16m,mode=1770"],
+      "volumes": [
+        {"type": "bind", "source": "${RUNTIME_SOCKET_DIR:?}", "target": "/run/runtime", "read_only": true},
+        {"type": "bind", "source": "${RUNTIME_AGENT_IDENTITY_DIR:?}", "target": "/run/identity", "read_only": true}
+      ],
+      "environment": {"NODE_ENV": "production"}, "stop_grace_period": "10s"
+    }
+  },
+  "networks": {"backend": {"internal": true}},
+  "secrets": {
+    "gateway_tls_key": {"file": "${RUNTIME_PKI_DIR:?}/gateway-key.pem"},
+    "gateway_tls_cert": {"file": "${RUNTIME_PKI_DIR:?}/gateway-cert.pem"},
+    "gateway_data_key": {"file": "${RUNTIME_SECRETS_DIR:?}/gateway-data.key"},
+    "gateway_audit_key": {"file": "${RUNTIME_SECRETS_DIR:?}/gateway-audit.key"},
+    "gateway_signing_key": {"file": "${RUNTIME_PKI_DIR:?}/gateway-signing-key.pem"},
+    "resource_tls_key": {"file": "${RUNTIME_PKI_DIR:?}/resource-key.pem"},
+    "resource_tls_cert": {"file": "${RUNTIME_PKI_DIR:?}/resource-cert.pem"},
+    "resource_data_key": {"file": "${RUNTIME_SECRETS_DIR:?}/resource-data.key"},
+    "resource_audit_key": {"file": "${RUNTIME_SECRETS_DIR:?}/resource-audit.key"},
+    "resource_signing_key": {"file": "${RUNTIME_PKI_DIR:?}/resource-signing-key.pem"},
+    "containment_receipt": {"file": "${RUNTIME_CONTAINMENT_RECEIPT:?}"},
+    "containment_trust": {"file": "${RUNTIME_CONTAINMENT_TRUST:?}"}
+  }
+}

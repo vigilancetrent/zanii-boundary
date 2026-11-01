@@ -1,0 +1,26 @@
+DROP TRIGGER audit_epoch ON __SCHEMA__.audit;
+DROP TRIGGER operations_epoch ON __SCHEMA__.operations;
+DROP TRIGGER objects_epoch ON __SCHEMA__.objects;
+DROP TRIGGER jobs_index_cleanup ON __SCHEMA__.objects;
+DROP FUNCTION __SCHEMA__.remove_job_index();
+DROP FUNCTION __SCHEMA__.maintenance_admission();
+DROP TRIGGER leases_epoch ON __SCHEMA__.leases;
+DROP FUNCTION __SCHEMA__.enforce_lease_epoch();
+DROP FUNCTION __SCHEMA__.active_lease_count();
+DROP FUNCTION __SCHEMA__.enforce_write_epoch();
+DROP FUNCTION __SCHEMA__.initialize_epoch(text);
+DROP FUNCTION __SCHEMA__.archive_prefix(text,bigint,text,bigint,text,text,text);
+DROP FUNCTION __SCHEMA__.prepare_archive_intent(text,text,text);
+DROP FUNCTION __SCHEMA__.write_backup_catalogue(text,text,text);
+DROP FUNCTION __SCHEMA__.write_maintenance_heartbeat(text);
+DROP FUNCTION __SCHEMA__.retained_key_records(text,integer);
+DROP TRIGGER archive_job_tenant ON __SCHEMA__.archive_jobs;
+DROP TRIGGER backup_job_tenant ON __SCHEMA__.backup_jobs;
+DROP TRIGGER backup_catalogue_tenant ON __SCHEMA__.backup_catalogues;
+DROP TRIGGER archive_intent_tenant ON __SCHEMA__.archive_intents;
+DROP FUNCTION __SCHEMA__.register_operational_tenant();
+DROP TABLE __SCHEMA__.job_tombstones,__SCHEMA__.job_index,__SCHEMA__.audit_bases,__SCHEMA__.key_epochs,__SCHEMA__.backup_catalogues,__SCHEMA__.archive_segments,__SCHEMA__.archive_intents,__SCHEMA__.archive_jobs,__SCHEMA__.backup_jobs,__SCHEMA__.maintenance_heartbeats;
+
+REVOKE ALL ON __SCHEMA__.objects,__SCHEMA__.operations,__SCHEMA__.usage,__SCHEMA__.audit,__SCHEMA__.leases,__SCHEMA__.schema_version FROM __SCHEMA___archive,__SCHEMA___backup,__SCHEMA___rotator;
+REVOKE EXECUTE ON FUNCTION __SCHEMA__.list_tenants(text,integer) FROM __SCHEMA___archive,__SCHEMA___backup,__SCHEMA___rotator;
+REVOKE EXECUTE ON FUNCTION __SCHEMA__.register_tenant(text) FROM __SCHEMA___rotator;

@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "images": {
+    "runtime": null,
+    "prometheus": null,
+    "alertmanager": null,
+    "grafana": null,
+    "otel-collector-contrib": null,
+    "loki": null,
+    "tempo": null
+  },
+  "note": "Replace nulls with independently verified repository@sha256 references. Unknown inputs are not deployable."
+}

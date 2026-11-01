@@ -1,0 +1,96 @@
+name: Product and security delivery gates
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    defaults:
+      run:
+        shell: bash
+    env:
+      TRIVY_CACHE_DIR: ${{ github.workspace }}/artifacts/private/security/trivy-cache
+      DOCKER_CONFIG: ${{ github.workspace }}/artifacts/private/security/docker-config
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # 7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # 7.1.0
+        with:
+          node-version: '24.19.0'
+          cache: npm
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # 7.1.0
+        with:
+          python-version: '3.12'
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Verify locked tools, pinned actions and private artifact exclusions
+        run: npm run product:delivery-policy
+      - run: 'python -m pip install --only-binary=:all: --require-hashes -r requirements-ci.txt'
+      - run: python scripts/test-pki.py --flat --output artifacts
+      - run: npm run product:check
+      - run: npm run product:lint
+      - run: npm run product:typecheck
+      - name: Actual Secretlint scan with redacted public counts
+        run: node scripts/security-report.mjs secrets
+      - run: npm test
+      - run: npm run test:isolated
+      - run: node --test --test-isolation=none test/acceptance-product-socket.mjs
+      - run: python -m unittest discover -s sdk/python -p 'test_*.py'
+      - name: Initialize actual CodeQL security analysis
+        id: codeql
+        uses: github/codeql-action/init@9b3254085494b55a0f7c4c2b3d2d52cc712ce370 # 4.39.1 action, not bundle
+        with:
+          languages: javascript-typescript,python
+          tools: linked
+          config-file: ./.github/codeql-config.yml
+      - name: Build pinned base into OCI with native BuildKit provenance
+        run: node scripts/security-report.mjs build --platform linux/amd64
+      - name: Install the exact native scanner from the pinned official setup action
+        uses: aquasecurity/setup-trivy@3fb12ec12f41e471780db15c232d5dd185dcb514 # official 0.2.6
+        with:
+          version: v0.76.1
+      - name: Create an isolated job-local scanner producer identity
+        run: |
+          node --input-type=module <<'NODE'
+          import {generateKeyPairSync} from 'node:crypto';
+          import {mkdir,writeFile} from 'node:fs/promises';
+          const directory='artifacts/private/security';
+          await mkdir(directory,{recursive:true,mode:0o700});
+          const {privateKey,publicKey}=generateKeyPairSync('ed25519');
+          await writeFile(directory+'/producer-key.pem',privateKey.export({type:'pkcs8',format:'pem'}),{flag:'wx',mode:0o600});
+          await writeFile(directory+'/producer-public.pem',publicKey.export({type:'spki',format:'pem'}),{flag:'wx',mode:0o600});
+          NODE
+      - name: Execute native scanners and sign only their new bound outputs
+        run: >-
+          node scripts/security-report.mjs produce
+          --producer-key artifacts/private/security/producer-key.pem
+          --producer-run-id ${{ github.run_id }}-${{ github.run_attempt }}
+          --codeql '${{ steps.codeql.outputs.codeql-path }}'
+          --codeql-version '${{ steps.codeql.outputs.codeql-version }}'
+          --platform linux/amd64
+      - name: Fail closed on findings, missing scanners, stale databases or mismatched evidence
+        if: always()
+        run: >-
+          node scripts/security-report.mjs report
+          --sarif artifacts/private/security/producer-${{ github.run_id }}-${{ github.run_attempt }}/javascript-typescript.sarif
+          --sarif artifacts/private/security/producer-${{ github.run_id }}-${{ github.run_attempt }}/python.sarif
+          --producer-manifest artifacts/private/security/producer-${{ github.run_id }}-${{ github.run_attempt }}/execution.json
+          --producer-public-key artifacts/private/security/producer-public.pem
+          --producer-run-id ${{ github.run_id }}-${{ github.run_attempt }}
+          --oci-archive artifacts/private/security/runtime.oci.tar
+          --build-metadata artifacts/private/security/build-metadata.json
+          --base-index artifacts/private/security/base-index.json
+          --image-report artifacts/private/security/producer-${{ github.run_id }}-${{ github.run_attempt }}/image.json
+          --source-dependency-report artifacts/private/security/producer-${{ github.run_id }}-${{ github.run_attempt }}/dependencies.json
+          --database-metadata artifacts/private/security/producer-${{ github.run_id }}-${{ github.run_attempt }}/trivy-cache/db/metadata.json
+          --platform linux/amd64
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # 7.0.2
+        if: always()
+        with:
+          name: public-security-delivery-summary
+          path: |
+            artifacts/security-delivery.json
+            artifacts/runtime-sbom.cdx.json
+          if-no-files-found: error

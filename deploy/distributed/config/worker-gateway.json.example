@@ -1,0 +1,52 @@
+{
+  "version": 1,
+  "role": "worker",
+  "realm": "gateway",
+  "storage": {
+    "backend": "postgres",
+    "encryptionKeyFile": "/run/secrets/worker_gateway_data_key",
+    "auditKeyFile": "/run/secrets/worker_gateway_audit_key",
+    "keyringFile": "/run/secrets/worker_gateway_keyring",
+    "retentionMs": 86400000,
+    "postgres": {
+      "credentialsFile": "/run/secrets/worker_gateway_postgres_credentials",
+      "caFile": "/run/trust/postgres-ca.pem",
+      "maxConnections": 4,
+      "acquireTimeoutMs": 1000,
+      "queryTimeoutMs": 2000,
+      "statementTimeoutMs": 1500,
+      "lockTimeoutMs": 500
+    }
+  },
+  "worker": {
+    "pollIntervalMs": 1000,
+    "leaseMs": 30000,
+    "timeoutMs": 20000,
+    "batchSize": 10
+  },
+  "services": {
+    "privacy": {}
+  },
+  "logging": {
+    "directory": "/var/log/runtime",
+    "maxBytes": 8388608,
+    "files": 3,
+    "maxQueueBytes": 65536,
+    "required": true
+  },
+  "telemetry": {
+    "serviceName": "runtime-worker-gateway",
+    "samplingRatio": 0.1,
+    "maxQueueSize": 512,
+    "maxExportBatchSize": 64,
+    "exportTimeoutMs": 3000,
+    "scheduledDelayMs": 1000,
+    "collector": {
+      "url": "https://otel-collector:4318/v1/traces",
+      "caFile": "/run/trust/monitoring-ca.pem",
+      "certFile": "/run/secrets/worker_gateway_otel_cert",
+      "keyFile": "/run/secrets/worker_gateway_otel_key",
+      "allowPrivateNetworks": true
+    }
+  }
+}

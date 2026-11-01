@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "project": "boundary-current",
+  "environment": {
+    "RUNTIME_CONFIG_DIR": "/srv/zanii-boundary/current/config",
+    "RUNTIME_SOCKET_DIR": "/srv/zanii-boundary/current/socket",
+    "RUNTIME_AGENT_IDENTITY_DIR": "/srv/zanii-boundary/current/agent-identity",
+    "RUNTIME_SECRETS_DIR": "/srv/zanii-boundary/current/secrets",
+    "RUNTIME_TRUST_DIR": "/srv/zanii-boundary/current/trust",
+    "RUNTIME_STATE_DIR": "/srv/zanii-boundary/current/state",
+    "RUNTIME_PROVIDER_NETWORK": "boundary-providers",
+    "RUNTIME_MONITORING_NETWORK": "boundary-monitoring"
+  },
+  "imageRef": "REPLACE_WITH_INDEPENDENTLY_VERIFIED_DIGEST_PINNED_IMAGE",
+  "composeFile": "compose.yaml",
+  "deploymentDirectory": ".",
+  "configurationDirectory": "/srv/zanii-boundary/current/config",
+  "identity": {
+    "caFile": "/secure/acceptance/ca.pem",
+    "certFile": "/secure/acceptance/operator-cert.pem",
+    "keyFile": "/secure/acceptance/operator-key.pem",
+    "tokenFile": "/secure/acceptance/operator.jwt"
+  },
+  "databases": {
+    "gateway": {
+      "credentialsFile": "/secure/acceptance/gateway-postgres.json",
+      "caFile": "/secure/acceptance/postgres-ca.pem"
+    },
+    "resource": {
+      "credentialsFile": "/secure/acceptance/resource-postgres.json",
+      "caFile": "/secure/acceptance/postgres-ca.pem"
+    }
+  },
+  "timeoutMs": 300000
+}

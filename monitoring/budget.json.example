@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "currency": "USD",
+  "spentMinor": "REPLACE_WITH_MEASURED_INTEGER_MINOR_UNITS",
+  "limitMinor": "REPLACE_WITH_APPROVED_NONZERO_INTEGER_MINOR_UNITS",
+  "periodStart": "REPLACE_WITH_EPOCH_MILLISECONDS",
+  "periodEnd": "REPLACE_WITH_EPOCH_MILLISECONDS",
+  "observedAt": "REPLACE_WITH_EPOCH_MILLISECONDS",
+  "source": "provider-usage-api",
+  "sourceDigest": "REPLACE_WITH_BILLING_EVIDENCE_SHA256_HEX"
+}

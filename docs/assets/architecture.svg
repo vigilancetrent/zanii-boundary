@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="480" viewBox="0 0 1200 480" role="img" aria-labelledby="title description">
+  <title id="title">Boundary request flow</title>
+  <desc id="description">An agent with a narrow identity sends a request over mutual TLS to the gateway. Within the trusted enforcement services, the gateway checks policy and reserves durable operation state in PostgreSQL before issuing a sender-bound grant. The resource service independently authorizes the permitted document action. Provider credentials remain outside agent access. Current authority is rechecked before dispatch and protected-result release. Linux containment requires deployment acceptance.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M1 1L8 5L1 9" fill="none" stroke="#48665e" stroke-width="1.5" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+  <rect x="0.5" y="0.5" width="1199" height="479" rx="12" fill="#ffffff" stroke="#d8dfdc"/>
+  <g font-family="Inter, Segoe UI, Arial, sans-serif">
+    <text x="40" y="47" fill="#17201e" font-size="28" font-weight="600" letter-spacing="-0.6">How a request becomes an action</text>
+    <text x="40" y="78" fill="#52615b" font-size="16">Task-scoped authority. Two independent authorization checks.</text>
+    <text x="1160" y="46" text-anchor="end" fill="#52615b" font-size="12" font-family="Consolas, Liberation Mono, monospace" letter-spacing="1">BOUNDARY / REQUEST FLOW</text>
+    <rect x="352" y="108" width="808" height="260" rx="8" fill="#f5f8f6" stroke="#9cafa6" stroke-dasharray="5 5"/>
+    <text x="376" y="133" fill="#48665e" font-size="12" font-weight="600" letter-spacing="1.2">TRUSTED ENFORCEMENT SERVICES</text>
+    <rect x="40" y="156" width="232" height="124" rx="8" fill="#ffffff" stroke="#a9b9b1"/>
+    <rect x="376" y="156" width="292" height="124" rx="8" fill="#172a24"/>
+    <rect x="844" y="156" width="292" height="124" rx="8" fill="#ffffff" stroke="#a9b9b1"/>
+    <g font-size="12" font-family="Consolas, Liberation Mono, monospace">
+      <text x="60" y="184" fill="#52615b">01 / REQUEST</text>
+      <text x="396" y="184" fill="#8dd9c2">02 / AUTHORIZE + RESERVE</text>
+      <text x="864" y="184" fill="#52615b">03 / AUTHORIZE + EXECUTE</text>
+    </g>
+    <g font-size="23" font-weight="600" letter-spacing="-0.4">
+      <text x="60" y="217" fill="#17201e">Agent</text>
+      <text x="396" y="217" fill="#f7f8f8">Gateway</text>
+      <text x="864" y="217" fill="#17201e">Resource service</text>
+    </g>
+    <g font-size="15">
+      <text x="60" y="246" fill="#52615b">Narrow identity</text>
+      <text x="60" y="267" fill="#52615b">No provider credentials</text>
+      <text x="396" y="246" fill="#d1e0d8">Check current policy</text>
+      <text x="396" y="267" fill="#d1e0d8">Reserve before dispatch</text>
+      <text x="864" y="246" fill="#52615b">Independent authorization</text>
+      <text x="864" y="267" fill="#52615b">Permitted document action</text>
+    </g>
+    <g fill="none" stroke="#48665e" stroke-width="1.5" marker-end="url(#arrow)">
+      <path d="M272 225H364"/>
+      <path d="M668 225H832"/>
+      <path d="M522 280V309"/>
+    </g>
+    <g fill="#48665e" font-size="13" text-anchor="middle" font-family="Consolas, Liberation Mono, monospace">
+      <text x="318" y="209">mTLS</text>
+      <text x="750" y="192">Sender-bound</text>
+      <text x="750" y="211">grant</text>
+    </g>
+    <rect x="376" y="320" width="292" height="30" rx="4" fill="#ffffff" stroke="#a9b9b1"/>
+    <text x="522" y="340" text-anchor="middle" fill="#17201e" font-size="14">PostgreSQL / durable authority</text>
+    <text x="844" y="329" fill="#52615b" font-size="14">Encrypted storage and audit</text>
+    <text x="844" y="350" fill="#52615b" font-size="14">Separate operational identities</text>
+    <path d="M40 394H1160" stroke="#d8dfdc"/>
+    <path d="M41 418H49 M45 414V422" stroke="#48665e" stroke-width="1.5"/>
+    <text x="60" y="423" fill="#17201e" font-size="15">Current authority is rechecked before dispatch and protected-result release.</text>
+    <text x="40" y="455" fill="#52615b" font-size="13">Simplified request flow</text>
+    <text x="1160" y="455" text-anchor="end" fill="#52615b" font-size="13">Linux containment requires live deployment acceptance.</text>
+  </g>
+</svg>

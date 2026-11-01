@@ -1,0 +1,687 @@
+{
+  "uid": "runtime-operations",
+  "title": "Zanii Boundary operations",
+  "schemaVersion": 39,
+  "version": 1,
+  "editable": false,
+  "timezone": "utc",
+  "refresh": "30s",
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "timeseries",
+      "title": "HTTP requests / second",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "runtime-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "sum by (job) (rate(runtime_requests_total[5m]))",
+          "refId": "A",
+          "legendFormat": "{{job}} {{role}} {{state}} {{target}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "Unknown"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "HTTP outcomes",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "runtime-prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 0,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "sum by (job,status_class) (rate(runtime_http_requests_total[5m]))",
+          "refId": "A",
+          "legendFormat": "{{job}} {{role}} {{state}} {{target}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "Unknown"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "HTTP p95 seconds",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "runtime-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 8,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum by (le,job) (rate(runtime_http_request_duration_seconds_bucket[5m])))",
+          "refId": "A",
+          "legendFormat": "{{job}} {{role}} {{state}} {{target}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "Unknown"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 4,
+      "type": "timeseries",
+      "title": "Admission saturation",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "runtime-prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 8,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "runtime_saturation_ratio",
+          "refId": "A",
+          "legendFormat": "{{job}} {{role}} {{state}} {{target}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "Unknown"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "Resident memory bytes",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "runtime-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 16,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "runtime_process_resident_memory_bytes",
+          "refId": "A",
+          "legendFormat": "{{job}} {{role}} {{state}} {{target}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "Unknown"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 6,
+      "type": "timeseries",
+      "title": "CPU seconds / second",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "runtime-prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 16,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "rate(runtime_process_cpu_seconds[5m])",
+          "refId": "A",
+          "legendFormat": "{{job}} {{role}} {{state}} {{target}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "Unknown"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 7,
+      "type": "timeseries",
+      "title": "Event loop delay seconds",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "runtime-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 24,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "runtime_event_loop_delay_seconds",
+          "refId": "A",
+          "legendFormat": "{{job}} {{role}} {{state}} {{target}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "Unknown"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 8,
+      "type": "timeseries",
+      "title": "Datastore pool waiting",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "runtime-prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 24,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "runtime_db_pool_waiting",
+          "refId": "A",
+          "legendFormat": "{{job}} {{role}} {{state}} {{target}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "Unknown"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 9,
+      "type": "timeseries",
+      "title": "Datastore bytes",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "runtime-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 32,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "runtime_db_bytes",
+          "refId": "A",
+          "legendFormat": "{{job}} {{role}} {{state}} {{target}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "Unknown"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 10,
+      "type": "timeseries",
+      "title": "Filesystem free bytes",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "runtime-prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 32,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "runtime_disk_free_bytes",
+          "refId": "A",
+          "legendFormat": "{{job}} {{role}} {{state}} {{target}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "Unknown"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 11,
+      "type": "timeseries",
+      "title": "Action outcomes",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "runtime-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 40,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "sum by (kind,state,job) (rate(runtime_action_outcomes_total[5m]))",
+          "refId": "A",
+          "legendFormat": "{{job}} {{role}} {{state}} {{target}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "Unknown"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 12,
+      "type": "timeseries",
+      "title": "Fixed dependency circuit states",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "runtime-prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 40,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "runtime_dependency_circuit_state",
+          "refId": "A",
+          "legendFormat": "{{job}} {{role}} {{state}} {{target}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "Unknown"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 13,
+      "type": "timeseries",
+      "title": "Durable maintenance queues",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "runtime-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 48,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "runtime_maintenance_jobs",
+          "refId": "A",
+          "legendFormat": "{{job}} {{role}} {{state}} {{target}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "Unknown"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 14,
+      "type": "timeseries",
+      "title": "Durable role heartbeat age seconds",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "runtime-prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 48,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "runtime_maintenance_heartbeat_age_seconds",
+          "refId": "A",
+          "legendFormat": "{{job}} {{role}} {{state}} {{target}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "Unknown"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 15,
+      "type": "timeseries",
+      "title": "Recovery point capture age seconds",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "runtime-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 56,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "runtime_backup_snapshot_age_seconds",
+          "refId": "A",
+          "legendFormat": "{{job}} {{role}} {{state}} {{target}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "Unknown"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 16,
+      "type": "timeseries",
+      "title": "Backup verification age seconds",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "runtime-prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 56,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "runtime_backup_verification_age_seconds",
+          "refId": "A",
+          "legendFormat": "{{job}} {{role}} {{state}} {{target}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "Unknown"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 17,
+      "type": "timeseries",
+      "title": "Audit archive age seconds",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "runtime-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 64,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "runtime_archive_age_seconds",
+          "refId": "A",
+          "legendFormat": "{{job}} {{role}} {{state}} {{target}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "Unknown"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 18,
+      "type": "timeseries",
+      "title": "Certificate / containment remaining seconds",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "runtime-prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 64,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "runtime_certificate_expiry_seconds or runtime_containment_expiry_seconds",
+          "refId": "A",
+          "legendFormat": "{{job}} {{role}} {{state}} {{target}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "Unknown"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 19,
+      "type": "timeseries",
+      "title": "Fixed replica probe outcomes",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "runtime-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 72,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "runtime_probe_success",
+          "refId": "A",
+          "legendFormat": "{{job}} {{role}} {{state}} {{target}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "Unknown"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 20,
+      "type": "timeseries",
+      "title": "Log sink health",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "runtime-prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 72,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "runtime_log_sink_healthy",
+          "refId": "A",
+          "legendFormat": "{{job}} {{role}} {{state}} {{target}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "Unknown"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 21,
+      "type": "timeseries",
+      "title": "Unknown operational signals",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "runtime-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 80,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "runtime_signal_available == 0",
+          "refId": "A",
+          "legendFormat": "{{job}} {{role}} {{state}} {{target}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "Unknown"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 22,
+      "type": "timeseries",
+      "title": "Measured spend / budget",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "runtime-prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 80,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "runtime_budget_spent_ratio",
+          "refId": "A",
+          "legendFormat": "{{job}} {{role}} {{state}} {{target}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "Unknown"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 23,
+      "type": "timeseries",
+      "title": "Trace export failures",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "runtime-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 88,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "increase(runtime_telemetry_export_failures[5m])",
+          "refId": "A",
+          "legendFormat": "{{job}} {{role}} {{state}} {{target}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "Unknown"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 24,
+      "type": "timeseries",
+      "title": "Controlled receiver observations",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "runtime-prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 88,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "monitoring_receiver_alerts_total or monitoring_receiver_traces_total or monitoring_receiver_logs_total",
+          "refId": "A",
+          "legendFormat": "{{job}} {{role}} {{state}} {{target}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "Unknown"
+        },
+        "overrides": []
+      }
+    }
+  ]
+}

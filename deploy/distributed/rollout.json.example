@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "stateDirectory": "/secure/acceptance/controllers",
+  "currentConfig": "acceptance.json",
+  "candidateConfig": "candidate-acceptance.json",
+  "currentReceipt": "/secure/acceptance/current-receipt.json",
+  "candidateReceipt": "/secure/acceptance/candidate-receipt.json",
+  "trustKeyFile": "/secure/acceptance/evaluator-public.pem",
+  "stableProbeConfig": "/secure/acceptance/stable-probe.json",
+  "samples": 10,
+  "recoveryMs": 30000
+}

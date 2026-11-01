@@ -1,0 +1,11 @@
+{
+  "title": "Agent runtime local operating signals",
+  "uid": "agent-runtime",
+  "schemaVersion": 39,
+  "version": 1,
+  "panels": [
+    {"id": 1, "type": "timeseries", "title": "Admitted requests per second", "gridPos": {"x": 0, "y": 0, "w": 12, "h": 8}, "targets": [{"expr": "rate(runtime_requests_total[5m])", "refId": "A"}]},
+    {"id": 2, "type": "timeseries", "title": "Denials and errors per second", "gridPos": {"x": 12, "y": 0, "w": 12, "h": 8}, "targets": [{"expr": "rate(runtime_denied_total[5m])", "refId": "A"}]},
+    {"id": 3, "type": "timeseries", "title": "Active admitted requests", "gridPos": {"x": 0, "y": 8, "w": 12, "h": 8}, "targets": [{"expr": "runtime_active", "refId": "A"}]}
+  ]
+}

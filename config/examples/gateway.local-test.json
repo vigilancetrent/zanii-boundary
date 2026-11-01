@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "role": "gateway",
+  "profile": "local-test",
+  "listen": { "host": "127.0.0.1", "port": 8443 },
+  "tls": { "certFile": "../../artifacts/test-pki-gateway-cert.pem", "keyFile": "../../artifacts/test-pki-gateway-key.pem", "caFile": "../../artifacts/test-pki-ca.pem", "requireClientCertificate": true },
+  "auth": { "issuer": "https://issuer.local", "audience": "gateway", "jwksFile": "../../artifacts/test-pki-issuer-public.jwks.json", "algorithms": ["EdDSA"], "requireSenderBinding": true, "maxLifetimeSeconds": 900 },
+  "storage": { "path": "../../.local-data/gateway.sqlite", "encryptionKeyFile": "../../artifacts/test-pki-gateway-data.key", "auditKeyFile": "../../artifacts/test-pki-gateway-audit.key", "retentionMs": 604800000 },
+  "signing": { "privateKeyFile": "../../artifacts/test-pki-gateway-signing-key.pem" },
+  "limits": { "bodyBytes": 65536, "requestTimeoutMs": 10000, "rateWindowMs": 60000, "rateRequests": 300, "maxConcurrency": 32 },
+  "integrations": {
+    "resource": { "origin": "https://127.0.0.1:8444", "caFile": "../../artifacts/test-pki-ca.pem", "certFile": "../../artifacts/test-pki-broker-cert.pem", "keyFile": "../../artifacts/test-pki-broker-key.pem", "issuer": "https://broker.local", "audience": "resource", "signingKeyFile": "../../artifacts/test-pki-gateway-signing-key.pem", "kid": "local-test-broker", "allowPrivateNetworks": true, "required": true }
+  },
+  "protocols": { "mcp": { "allowedOrigins": [] }, "a2a": { "publicUrl": "https://127.0.0.1:8443/a2a" } }
+}

@@ -1,0 +1,124 @@
+{
+  "version": 1,
+  "role": "resource",
+  "profile": "production",
+  "listen": {
+    "host": "0.0.0.0",
+    "port": 8444
+  },
+  "tls": {
+    "certFile": "/run/secrets/resource_tls_cert",
+    "keyFile": "/run/secrets/resource_tls_key",
+    "caFile": "/run/trust/ca.pem",
+    "requireClientCertificate": true
+  },
+  "auth": {
+    "issuer": "https://company-runtime-broker",
+    "audience": "company-document-resource",
+    "jwksFile": "/run/trust/broker.jwks.json",
+    "algorithms": [
+      "EdDSA"
+    ],
+    "requireSenderBinding": true,
+    "maxLifetimeSeconds": 900
+  },
+  "storage": {
+    "backend": "postgres",
+    "encryptionKeyFile": "/run/secrets/resource_data_key",
+    "auditKeyFile": "/run/secrets/resource_audit_key",
+    "keyringFile": "/run/secrets/resource_keyring",
+    "retentionMs": 86400000,
+    "postgres": {
+      "credentialsFile": "/run/secrets/resource_postgres_credentials",
+      "caFile": "/run/trust/postgres-ca.pem",
+      "role": "app",
+      "maxConnections": 8,
+      "acquireTimeoutMs": 1000,
+      "queryTimeoutMs": 2000,
+      "statementTimeoutMs": 1500,
+      "lockTimeoutMs": 500
+    }
+  },
+  "signing": {
+    "privateKeyFile": "/run/secrets/resource_signing_key"
+  },
+  "limits": {
+    "bodyBytes": 65536,
+    "requestTimeoutMs": 10000,
+    "rateWindowMs": 60000,
+    "rateRequests": 300,
+    "maxConcurrency": 32
+  },
+  "deployment": {
+    "kind": "linux-distributed-v2",
+    "receiptFile": "/run/secrets/resource_containment_receipt",
+    "trustKeyFile": "/run/trust/distributed-evaluator.pem",
+    "maxAgeMs": 900000,
+    "profileDigest": "REPLACE_WITH_MEASURED_PROFILE_DIGEST",
+    "imageRef": "REPLACE_WITH_VERIFIED_PRODUCT_IMAGE"
+  },
+  "integrations": {
+    "documents": {
+      "toolVersion": "documents-v1",
+      "maxContentBytes": 32768,
+      "internalRecipients": []
+    }
+  },
+  "protocols": {},
+  "operations": {
+    "policy": {
+      "required": true,
+      "worker": {
+        "required": true
+      },
+      "archive": {
+        "required": true
+      },
+      "backup": {
+        "required": true
+      }
+    },
+    "services": {
+      "privacy": {},
+      "objects": {
+        "endpoint": "https://objects.company.invalid",
+        "region": "eu-central-1",
+        "credentialsFile": "/run/secrets/resource_objects_credentials",
+        "caFile": "/run/trust/provider-ca.pem",
+        "allowPrivateNetworks": true,
+        "timeoutMs": 10000,
+        "bucket": "runtime-documents",
+        "prefix": "documents",
+        "indexKeyFile": "/run/secrets/resource_objects_index_key",
+        "encryptionKeyFile": "/run/secrets/resource_objects_data_key",
+        "encryptionKeyId": "app-objects-v1",
+        "serverEncryption": "aws:kms",
+        "sseKmsKeyId": "REPLACE_WITH_VERIFIED_KMS_KEY_ARN",
+        "requireLock": false,
+        "maxBytes": 1048576
+      }
+    }
+  },
+  "logging": {
+    "directory": "/var/log/runtime",
+    "maxBytes": 8388608,
+    "files": 3,
+    "maxQueueBytes": 65536,
+    "required": true
+  },
+  "telemetry": {
+    "serviceName": "runtime-resource",
+    "samplingRatio": 0.1,
+    "maxQueueSize": 512,
+    "maxExportBatchSize": 64,
+    "exportTimeoutMs": 3000,
+    "scheduledDelayMs": 1000,
+    "collector": {
+      "url": "https://otel-collector:4318/v1/traces",
+      "caFile": "/run/trust/monitoring-ca.pem",
+      "certFile": "/run/secrets/resource_otel_cert",
+      "keyFile": "/run/secrets/resource_otel_key",
+      "allowPrivateNetworks": true
+    }
+  }
+}

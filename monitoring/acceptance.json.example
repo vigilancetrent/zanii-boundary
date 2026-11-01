@@ -1,0 +1,89 @@
+{
+  "version": 1,
+  "root": "..",
+  "configurationDirectory": "../.secrets/distributed/config",
+  "composeFile": "../deploy/distributed/compose.yaml",
+  "monitoringNetwork": "REPLACE_WITH_VERIFIED_INTERNAL_MONITORING_NETWORK",
+  "containers": {
+    "prometheus": "REPLACE_WITH_ACTUAL_CONTAINER_ID_64HEX",
+    "alertmanager": "REPLACE_WITH_ACTUAL_CONTAINER_ID_64HEX",
+    "grafana": "REPLACE_WITH_ACTUAL_CONTAINER_ID_64HEX",
+    "otel-collector": "REPLACE_WITH_ACTUAL_CONTAINER_ID_64HEX",
+    "loki": "REPLACE_WITH_ACTUAL_CONTAINER_ID_64HEX",
+    "tempo": "REPLACE_WITH_ACTUAL_CONTAINER_ID_64HEX",
+    "monitoring-receiver": "REPLACE_WITH_ACTUAL_CONTAINER_ID_64HEX",
+    "probe-exporter": "REPLACE_WITH_ACTUAL_CONTAINER_ID_64HEX"
+  },
+  "runtimeContainers": [
+    "REPLACE_WITH_EACH_ACTUAL_GATEWAY_RESOURCE_WORKER_ARCHIVE_BACKUP_CONTAINER_ID"
+  ],
+  "images": {
+    "runtime": "REPLACE_WITH_VERIFIED_REPOSITORY_AT_SHA256",
+    "prometheus": "REPLACE_WITH_VERIFIED_REPOSITORY_AT_SHA256",
+    "alertmanager": "REPLACE_WITH_VERIFIED_REPOSITORY_AT_SHA256",
+    "grafana": "REPLACE_WITH_VERIFIED_REPOSITORY_AT_SHA256",
+    "otel-collector-contrib": "REPLACE_WITH_VERIFIED_REPOSITORY_AT_SHA256",
+    "loki": "REPLACE_WITH_VERIFIED_REPOSITORY_AT_SHA256",
+    "tempo": "REPLACE_WITH_VERIFIED_REPOSITORY_AT_SHA256"
+  },
+  "deployment": {
+    "mode": "deployment",
+    "profileDigest": "REPLACE_WITH_MEASURED_V2_PROFILE_DIGEST",
+    "runtimeImage": "REPLACE_WITH_VERIFIED_RUNTIME_DIGEST_REF",
+    "collectorImage": "REPLACE_WITH_VERIFIED_COLLECTOR_DIGEST_REF"
+  },
+  "endpoints": {
+    "prometheus": {
+      "origin": "https://127.0.0.1:9090",
+      "servername": "prometheus",
+      "caFile": "../.secrets/monitoring/acceptance/ca.pem",
+      "certFile": "../.secrets/monitoring/acceptance/client-cert.pem",
+      "keyFile": "../.secrets/monitoring/acceptance/client-key.pem",
+      "allowPrivateNetworks": true
+    },
+    "alertmanager": {
+      "origin": "https://127.0.0.1:9093",
+      "servername": "alertmanager",
+      "caFile": "../.secrets/monitoring/acceptance/ca.pem",
+      "certFile": "../.secrets/monitoring/acceptance/client-cert.pem",
+      "keyFile": "../.secrets/monitoring/acceptance/client-key.pem",
+      "allowPrivateNetworks": true
+    },
+    "grafana": {
+      "origin": "https://127.0.0.1:3000",
+      "servername": "grafana",
+      "caFile": "../.secrets/monitoring/acceptance/ca.pem",
+      "certFile": "../.secrets/monitoring/acceptance/client-cert.pem",
+      "keyFile": "../.secrets/monitoring/acceptance/client-key.pem",
+      "allowPrivateNetworks": true,
+      "tokenFile": "../.secrets/monitoring/acceptance/grafana.token"
+    },
+    "loki": {
+      "origin": "https://127.0.0.1:3100",
+      "servername": "loki",
+      "caFile": "../.secrets/monitoring/acceptance/ca.pem",
+      "certFile": "../.secrets/monitoring/acceptance/client-cert.pem",
+      "keyFile": "../.secrets/monitoring/acceptance/client-key.pem",
+      "allowPrivateNetworks": true
+    },
+    "tempo": {
+      "origin": "https://127.0.0.1:3200",
+      "servername": "tempo",
+      "caFile": "../.secrets/monitoring/acceptance/ca.pem",
+      "certFile": "../.secrets/monitoring/acceptance/client-cert.pem",
+      "keyFile": "../.secrets/monitoring/acceptance/client-key.pem",
+      "allowPrivateNetworks": true
+    },
+    "receiver": {
+      "origin": "https://127.0.0.1:9444",
+      "servername": "monitoring-receiver",
+      "caFile": "../.secrets/monitoring/acceptance/ca.pem",
+      "certFile": "../.secrets/monitoring/acceptance/client-cert.pem",
+      "keyFile": "../.secrets/monitoring/acceptance/client-key.pem",
+      "allowPrivateNetworks": true,
+      "tokenFile": "../.secrets/monitoring/acceptance/monitoring-receiver.token"
+    }
+  },
+  "receiptPublicKeyFile": "../.secrets/monitoring/acceptance/receipt-public.pem",
+  "timeoutMs": 60000
+}

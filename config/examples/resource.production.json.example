@@ -1,0 +1,12 @@
+{
+  "version": 1, "role": "resource", "profile": "production",
+  "listen": { "host": "0.0.0.0", "port": 8444 },
+  "tls": { "certFile": "/run/secrets/resource_tls_cert", "keyFile": "/run/secrets/resource_tls_key", "caFile": "/run/trust/ca.pem", "requireClientCertificate": true },
+  "auth": { "issuer": "https://company-runtime-broker", "audience": "company-document-resource", "jwksFile": "/run/trust/broker.jwks.json", "algorithms": ["EdDSA"], "requireSenderBinding": true, "maxLifetimeSeconds": 900 },
+  "storage": { "path": "/var/lib/runtime/runtime.sqlite", "encryptionKeyFile": "/run/secrets/resource_data_key", "auditKeyFile": "/run/secrets/resource_audit_key", "retentionMs": 604800000 },
+  "signing": { "privateKeyFile": "/run/secrets/resource_signing_key" },
+  "limits": { "bodyBytes": 65536, "requestTimeoutMs": 10000, "rateWindowMs": 60000, "rateRequests": 300, "maxConcurrency": 32 },
+  "deployment": { "receiptFile": "/run/secrets/containment_receipt", "trustKeyFile": "/run/secrets/containment_trust", "maxAgeMs": 900000, "profileDigest": "REPLACE_WITH_MEASURED_PROFILE_DIGEST", "imageRef": "REPLACE_WITH_VERIFIED_DIGEST_PINNED_PRODUCT_IMAGE" },
+  "integrations": { "documents": { "toolVersion": "documents-v1", "maxContentBytes": 32768, "internalRecipients": [], "importRoot": "/var/lib/documents" } },
+  "protocols": {}
+}

@@ -1,0 +1,563 @@
+{
+  "name": "runtime-monitoring",
+  "services": {
+    "prometheus": {
+      "read_only": true,
+      "cap_drop": [
+        "ALL"
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "pids_limit": 128,
+      "mem_limit": "512m",
+      "cpus": 1,
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,size=32m,mode=1770"
+      ],
+      "networks": [
+        "monitoring"
+      ],
+      "stop_grace_period": "30s",
+      "logging": {
+        "driver": "json-file",
+        "options": {
+          "max-size": "10m",
+          "max-file": "3"
+        }
+      },
+      "image": "${PROMETHEUS_IMAGE:?Set a verified repository@sha256 image}",
+      "user": "20004:3000",
+      "command": [
+        "--config.file=/etc/prometheus/prometheus.yaml",
+        "--web.config.file=/etc/prometheus/web.yaml",
+        "--storage.tsdb.path=/prometheus",
+        "--storage.tsdb.retention.time=7d",
+        "--storage.tsdb.retention.size=2GB"
+      ],
+      "volumes": [
+        {
+          "type": "bind",
+          "source": "${MONITORING_PKI_DIR:?}/prometheus",
+          "target": "/run/monitoring/prometheus",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "${RUNTIME_MONITORING_DIR:?}/prometheus.yaml",
+          "target": "/etc/prometheus/prometheus.yaml",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "${RUNTIME_MONITORING_DIR:?}/prometheus-web.yaml",
+          "target": "/etc/prometheus/web.yaml",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "${RUNTIME_MONITORING_DIR:?}/alerts.yaml",
+          "target": "/etc/prometheus/alerts.yaml",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "${MONITORING_STATE_DIR:?}/prometheus",
+          "target": "/prometheus"
+        }
+      ],
+      "ports": [
+        {
+          "target": 9090,
+          "published": "9090",
+          "host_ip": "127.0.0.1",
+          "protocol": "tcp"
+        }
+      ]
+    },
+    "alertmanager": {
+      "read_only": true,
+      "cap_drop": [
+        "ALL"
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "pids_limit": 128,
+      "mem_limit": "512m",
+      "cpus": 1,
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,size=32m,mode=1770"
+      ],
+      "networks": [
+        "monitoring"
+      ],
+      "stop_grace_period": "30s",
+      "logging": {
+        "driver": "json-file",
+        "options": {
+          "max-size": "10m",
+          "max-file": "3"
+        }
+      },
+      "image": "${ALERTMANAGER_IMAGE:?Set a verified repository@sha256 image}",
+      "user": "20005:3000",
+      "command": [
+        "--config.file=/etc/alertmanager/alertmanager.yaml",
+        "--web.config.file=/etc/alertmanager/web.yaml",
+        "--storage.path=/alertmanager",
+        "--data.retention=168h"
+      ],
+      "volumes": [
+        {
+          "type": "bind",
+          "source": "${MONITORING_PKI_DIR:?}/alertmanager",
+          "target": "/run/monitoring/alertmanager",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "${RUNTIME_MONITORING_DIR:?}/alertmanager.yaml",
+          "target": "/etc/alertmanager/alertmanager.yaml",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "${RUNTIME_MONITORING_DIR:?}/alertmanager-web.yaml",
+          "target": "/etc/alertmanager/web.yaml",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "${MONITORING_STATE_DIR:?}/alertmanager",
+          "target": "/alertmanager"
+        }
+      ],
+      "ports": [
+        {
+          "target": 9093,
+          "published": "9093",
+          "host_ip": "127.0.0.1",
+          "protocol": "tcp"
+        }
+      ]
+    },
+    "grafana": {
+      "read_only": true,
+      "cap_drop": [
+        "ALL"
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "pids_limit": 128,
+      "mem_limit": "768m",
+      "cpus": 1,
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,size=32m,mode=1770"
+      ],
+      "networks": [
+        "monitoring"
+      ],
+      "stop_grace_period": "30s",
+      "logging": {
+        "driver": "json-file",
+        "options": {
+          "max-size": "10m",
+          "max-file": "3"
+        }
+      },
+      "image": "${GRAFANA_IMAGE:?Set a verified repository@sha256 image}",
+      "user": "20003:3000",
+      "command": [
+        "--config=/etc/grafana/grafana.ini"
+      ],
+      "volumes": [
+        {
+          "type": "bind",
+          "source": "${MONITORING_PKI_DIR:?}/grafana",
+          "target": "/run/monitoring/grafana",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "${RUNTIME_MONITORING_DIR:?}/grafana/grafana.ini",
+          "target": "/etc/grafana/grafana.ini",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "${RUNTIME_MONITORING_DIR:?}/grafana/dashboards.yaml",
+          "target": "/etc/grafana/provisioning/dashboards/runtime.yaml",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "${RUNTIME_MONITORING_DIR:?}/dashboard.json",
+          "target": "/var/lib/grafana/dashboards/runtime.json",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "${MONITORING_STATE_DIR:?}/grafana",
+          "target": "/var/lib/grafana"
+        },
+        {
+          "type": "bind",
+          "source": "${MONITORING_PRIVATE_CONFIG_DIR:?}/grafana-datasources.yaml",
+          "target": "/etc/grafana/provisioning/datasources/runtime.yaml",
+          "read_only": true
+        }
+      ],
+      "ports": [
+        {
+          "target": 3000,
+          "published": "3000",
+          "host_ip": "127.0.0.1",
+          "protocol": "tcp"
+        }
+      ]
+    },
+    "otel-collector": {
+      "read_only": true,
+      "cap_drop": [
+        "ALL"
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "pids_limit": 128,
+      "mem_limit": "512m",
+      "cpus": 1,
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,size=32m,mode=1770"
+      ],
+      "networks": [
+        "monitoring"
+      ],
+      "stop_grace_period": "30s",
+      "logging": {
+        "driver": "json-file",
+        "options": {
+          "max-size": "10m",
+          "max-file": "3"
+        }
+      },
+      "image": "${OTEL_COLLECTOR_IMAGE:?Set a verified repository@sha256 image}",
+      "user": "20001:3000",
+      "command": [
+        "--config=/etc/otelcol/config.yaml"
+      ],
+      "volumes": [
+        {
+          "type": "bind",
+          "source": "${MONITORING_PKI_DIR:?}/collector",
+          "target": "/run/monitoring/collector",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "${RUNTIME_MONITORING_DIR:?}/otel-collector.yaml",
+          "target": "/etc/otelcol/config.yaml",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "${MONITORING_STATE_DIR:?}/otel-collector",
+          "target": "/var/lib/otel"
+        },
+        {
+          "type": "bind",
+          "source": "${RUNTIME_STATE_DIR:?}/gateway/logs",
+          "target": "/var/log/runtime/gateway",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "${RUNTIME_STATE_DIR:?}/resource/logs",
+          "target": "/var/log/runtime/resource",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "${RUNTIME_STATE_DIR:?}/worker-gateway/logs",
+          "target": "/var/log/runtime/worker-gateway",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "${RUNTIME_STATE_DIR:?}/worker-resource/logs",
+          "target": "/var/log/runtime/worker-resource",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "${RUNTIME_STATE_DIR:?}/archive-gateway/logs",
+          "target": "/var/log/runtime/archive-gateway",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "${RUNTIME_STATE_DIR:?}/archive-resource/logs",
+          "target": "/var/log/runtime/archive-resource",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "${RUNTIME_STATE_DIR:?}/backup-gateway/logs",
+          "target": "/var/log/runtime/backup-gateway",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "${RUNTIME_STATE_DIR:?}/backup-resource/logs",
+          "target": "/var/log/runtime/backup-resource",
+          "read_only": true
+        }
+      ]
+    },
+    "loki": {
+      "read_only": true,
+      "cap_drop": [
+        "ALL"
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "pids_limit": 128,
+      "mem_limit": "768m",
+      "cpus": 1,
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,size=32m,mode=1770"
+      ],
+      "networks": [
+        "monitoring"
+      ],
+      "stop_grace_period": "30s",
+      "logging": {
+        "driver": "json-file",
+        "options": {
+          "max-size": "10m",
+          "max-file": "3"
+        }
+      },
+      "image": "${LOKI_IMAGE:?Set a verified repository@sha256 image}",
+      "user": "20002:3000",
+      "command": [
+        "-config.file=/etc/loki/config.yaml"
+      ],
+      "volumes": [
+        {
+          "type": "bind",
+          "source": "${MONITORING_PKI_DIR:?}/loki",
+          "target": "/run/monitoring/loki",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "${RUNTIME_MONITORING_DIR:?}/loki.yaml",
+          "target": "/etc/loki/config.yaml",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "${MONITORING_STATE_DIR:?}/loki",
+          "target": "/var/lib/loki"
+        }
+      ],
+      "ports": [
+        {
+          "target": 3100,
+          "published": "3100",
+          "host_ip": "127.0.0.1",
+          "protocol": "tcp"
+        }
+      ]
+    },
+    "tempo": {
+      "read_only": true,
+      "cap_drop": [
+        "ALL"
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "pids_limit": 128,
+      "mem_limit": "768m",
+      "cpus": 1,
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,size=32m,mode=1770"
+      ],
+      "networks": [
+        "monitoring"
+      ],
+      "stop_grace_period": "30s",
+      "logging": {
+        "driver": "json-file",
+        "options": {
+          "max-size": "10m",
+          "max-file": "3"
+        }
+      },
+      "image": "${TEMPO_IMAGE:?Set a verified repository@sha256 image}",
+      "user": "20006:3000",
+      "command": [
+        "-config.file=/etc/tempo/config.yaml"
+      ],
+      "volumes": [
+        {
+          "type": "bind",
+          "source": "${MONITORING_PKI_DIR:?}/tempo",
+          "target": "/run/monitoring/tempo",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "${RUNTIME_MONITORING_DIR:?}/tempo.yaml",
+          "target": "/etc/tempo/config.yaml",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "${MONITORING_STATE_DIR:?}/tempo",
+          "target": "/var/lib/tempo"
+        }
+      ],
+      "ports": [
+        {
+          "target": 3200,
+          "published": "3200",
+          "host_ip": "127.0.0.1",
+          "protocol": "tcp"
+        }
+      ]
+    },
+    "monitoring-receiver": {
+      "read_only": true,
+      "cap_drop": [
+        "ALL"
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "pids_limit": 128,
+      "mem_limit": "512m",
+      "cpus": 1,
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,size=32m,mode=1770"
+      ],
+      "networks": [
+        "monitoring"
+      ],
+      "stop_grace_period": "30s",
+      "logging": {
+        "driver": "json-file",
+        "options": {
+          "max-size": "10m",
+          "max-file": "3"
+        }
+      },
+      "image": "${RUNTIME_IMAGE:?Set a verified repository@sha256 image}",
+      "user": "20007:3000",
+      "command": [
+        "scripts/monitoring-receiver.mjs",
+        "--config",
+        "/run/config/receiver.json"
+      ],
+      "entrypoint": [
+        "node"
+      ],
+      "volumes": [
+        {
+          "type": "bind",
+          "source": "${MONITORING_PKI_DIR:?}/monitoring-receiver",
+          "target": "/run/monitoring/monitoring-receiver",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "${MONITORING_STATE_DIR:?}/monitoring-receiver",
+          "target": "/var/lib/monitoring-receiver"
+        },
+        {
+          "type": "bind",
+          "source": "${MONITORING_PRIVATE_CONFIG_DIR:?}/receiver.json",
+          "target": "/run/config/receiver.json",
+          "read_only": true
+        }
+      ],
+      "ports": [
+        {
+          "target": 9444,
+          "published": "9444",
+          "host_ip": "127.0.0.1",
+          "protocol": "tcp"
+        }
+      ]
+    },
+    "probe-exporter": {
+      "read_only": true,
+      "cap_drop": [
+        "ALL"
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "pids_limit": 128,
+      "mem_limit": "512m",
+      "cpus": 1,
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,size=32m,mode=1770"
+      ],
+      "networks": [
+        "monitoring"
+      ],
+      "stop_grace_period": "30s",
+      "logging": {
+        "driver": "json-file",
+        "options": {
+          "max-size": "10m",
+          "max-file": "3"
+        }
+      },
+      "image": "${RUNTIME_IMAGE:?Set a verified repository@sha256 image}",
+      "user": "20008:3000",
+      "command": [
+        "scripts/probe-server.mjs",
+        "--config",
+        "/run/config/probe-server.json"
+      ],
+      "entrypoint": [
+        "node"
+      ],
+      "volumes": [
+        {
+          "type": "bind",
+          "source": "${MONITORING_PKI_DIR:?}/probe-exporter",
+          "target": "/run/monitoring/probe-exporter",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "${MONITORING_PRIVATE_CONFIG_DIR:?}/probe-server.json",
+          "target": "/run/config/probe-server.json",
+          "read_only": true
+        }
+      ],
+      "ports": [
+        {
+          "target": 9464,
+          "published": "9464",
+          "host_ip": "127.0.0.1",
+          "protocol": "tcp"
+        }
+      ]
+    }
+  },
+  "networks": {
+    "monitoring": {
+      "external": true,
+      "name": "${RUNTIME_MONITORING_NETWORK:?Set the verified internal monitoring network}"
+    }
+  }
+}

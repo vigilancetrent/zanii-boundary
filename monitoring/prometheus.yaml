@@ -1,0 +1,237 @@
+{
+  "global": {
+    "scrape_interval": "15s",
+    "evaluation_interval": "15s",
+    "external_labels": {
+      "cluster": "agent-runtime-distributed"
+    }
+  },
+  "rule_files": [
+    "/etc/prometheus/alerts.yaml"
+  ],
+  "alerting": {
+    "alertmanagers": [
+      {
+        "scheme": "https",
+        "static_configs": [
+          {
+            "targets": [
+              "alertmanager:9093"
+            ]
+          }
+        ],
+        "tls_config": {
+          "ca_file": "/run/monitoring/prometheus/ca.pem",
+          "cert_file": "/run/monitoring/prometheus/client-cert.pem",
+          "key_file": "/run/monitoring/prometheus/client-key.pem",
+          "min_version": "TLS13",
+          "server_name": "alertmanager"
+        }
+      }
+    ]
+  },
+  "scrape_configs": [
+    {
+      "job_name": "runtime-gateway",
+      "scheme": "https",
+      "metrics_path": "/metrics",
+      "scrape_interval": "15s",
+      "scrape_timeout": "10s",
+      "sample_limit": 20000,
+      "label_limit": 16,
+      "dns_sd_configs": [
+        {
+          "names": [
+            "gateway"
+          ],
+          "type": "A",
+          "port": 8443,
+          "refresh_interval": "15s"
+        }
+      ],
+      "tls_config": {
+        "ca_file": "/run/monitoring/prometheus/ca.pem",
+        "cert_file": "/run/monitoring/prometheus/gateway-cert.pem",
+        "key_file": "/run/monitoring/prometheus/gateway-key.pem",
+        "min_version": "TLS13",
+        "server_name": "gateway"
+      },
+      "authorization": {
+        "type": "Bearer",
+        "credentials_file": "/run/monitoring/prometheus/gateway.jwt"
+      },
+      "metric_relabel_configs": [
+        {
+          "action": "labeldrop",
+          "regex": "tenant|actor|document.*|recipient|request.?id|url|token|secret"
+        }
+      ],
+      "relabel_configs": [
+        {
+          "target_label": "realm",
+          "replacement": "gateway"
+        }
+      ]
+    },
+    {
+      "job_name": "runtime-resource",
+      "scheme": "https",
+      "metrics_path": "/metrics",
+      "scrape_interval": "15s",
+      "scrape_timeout": "10s",
+      "sample_limit": 20000,
+      "label_limit": 16,
+      "dns_sd_configs": [
+        {
+          "names": [
+            "resource"
+          ],
+          "type": "A",
+          "port": 8444,
+          "refresh_interval": "15s"
+        }
+      ],
+      "tls_config": {
+        "ca_file": "/run/monitoring/prometheus/ca.pem",
+        "cert_file": "/run/monitoring/prometheus/resource-cert.pem",
+        "key_file": "/run/monitoring/prometheus/resource-key.pem",
+        "min_version": "TLS13",
+        "server_name": "resource"
+      },
+      "authorization": {
+        "type": "Bearer",
+        "credentials_file": "/run/monitoring/prometheus/resource.jwt"
+      },
+      "metric_relabel_configs": [
+        {
+          "action": "labeldrop",
+          "regex": "tenant|actor|document.*|recipient|request.?id|url|token|secret"
+        }
+      ],
+      "relabel_configs": [
+        {
+          "target_label": "realm",
+          "replacement": "resource"
+        }
+      ]
+    },
+    {
+      "job_name": "runtime-probes",
+      "scheme": "https",
+      "metrics_path": "/metrics",
+      "scrape_timeout": "10s",
+      "sample_limit": 20000,
+      "label_limit": 16,
+      "static_configs": [
+        {
+          "targets": [
+            "probe-exporter:9464"
+          ]
+        }
+      ],
+      "tls_config": {
+        "ca_file": "/run/monitoring/prometheus/ca.pem",
+        "cert_file": "/run/monitoring/prometheus/client-cert.pem",
+        "key_file": "/run/monitoring/prometheus/client-key.pem",
+        "min_version": "TLS13",
+        "server_name": "probe-exporter"
+      },
+      "authorization": {
+        "type": "Bearer",
+        "credentials_file": "/run/monitoring/prometheus/probe.token"
+      }
+    },
+    {
+      "job_name": "monitoring-receiver",
+      "scheme": "https",
+      "metrics_path": "/metrics",
+      "scrape_timeout": "10s",
+      "sample_limit": 20000,
+      "label_limit": 16,
+      "static_configs": [
+        {
+          "targets": [
+            "monitoring-receiver:9444"
+          ]
+        }
+      ],
+      "tls_config": {
+        "ca_file": "/run/monitoring/prometheus/ca.pem",
+        "cert_file": "/run/monitoring/prometheus/client-cert.pem",
+        "key_file": "/run/monitoring/prometheus/client-key.pem",
+        "min_version": "TLS13",
+        "server_name": "monitoring-receiver"
+      },
+      "authorization": {
+        "type": "Bearer",
+        "credentials_file": "/run/monitoring/prometheus/receipt.token"
+      }
+    },
+    {
+      "job_name": "otel-collector",
+      "scheme": "https",
+      "metrics_path": "/metrics",
+      "scrape_timeout": "10s",
+      "sample_limit": 20000,
+      "label_limit": 16,
+      "static_configs": [
+        {
+          "targets": [
+            "otel-collector:8889"
+          ]
+        }
+      ],
+      "tls_config": {
+        "ca_file": "/run/monitoring/prometheus/ca.pem",
+        "cert_file": "/run/monitoring/prometheus/client-cert.pem",
+        "key_file": "/run/monitoring/prometheus/client-key.pem",
+        "min_version": "TLS13",
+        "server_name": "otel-collector"
+      }
+    },
+    {
+      "job_name": "loki",
+      "scheme": "https",
+      "metrics_path": "/metrics",
+      "scrape_timeout": "10s",
+      "sample_limit": 20000,
+      "label_limit": 16,
+      "static_configs": [
+        {
+          "targets": [
+            "loki:3100"
+          ]
+        }
+      ],
+      "tls_config": {
+        "ca_file": "/run/monitoring/prometheus/ca.pem",
+        "cert_file": "/run/monitoring/prometheus/client-cert.pem",
+        "key_file": "/run/monitoring/prometheus/client-key.pem",
+        "min_version": "TLS13",
+        "server_name": "loki"
+      }
+    },
+    {
+      "job_name": "tempo",
+      "scheme": "https",
+      "metrics_path": "/metrics",
+      "scrape_timeout": "10s",
+      "sample_limit": 20000,
+      "label_limit": 16,
+      "static_configs": [
+        {
+          "targets": [
+            "tempo:3200"
+          ]
+        }
+      ],
+      "tls_config": {
+        "ca_file": "/run/monitoring/prometheus/ca.pem",
+        "cert_file": "/run/monitoring/prometheus/client-cert.pem",
+        "key_file": "/run/monitoring/prometheus/client-key.pem",
+        "min_version": "TLS13",
+        "server_name": "tempo"
+      }
+    }
+  ]
+}

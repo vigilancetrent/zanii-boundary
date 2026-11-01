@@ -1,0 +1,17 @@
+{
+  "apiVersion": 1,
+  "providers": [
+    {
+      "name": "runtime",
+      "orgId": 1,
+      "folder": "Agent runtime",
+      "type": "file",
+      "disableDeletion": true,
+      "editable": false,
+      "updateIntervalSeconds": 30,
+      "options": {
+        "path": "/var/lib/grafana/dashboards"
+      }
+    }
+  ]
+}

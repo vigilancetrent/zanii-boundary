@@ -1,0 +1,13 @@
+name: Runtime security queries
+queries:
+  - uses: security-extended
+paths:
+  - src
+  - scripts
+  - sdk
+paths-ignore:
+  - artifacts
+  - archive
+  - node_modules
+  - .test-data
+  - .npm-cache

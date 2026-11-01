@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="360" viewBox="0 0 1200 360" role="img" aria-labelledby="title description">
+  <title id="title">Zanii Boundary</title>
+  <desc id="description">Controlled execution for company AI agents. An agent authenticates over mutual TLS to the execution boundary, which authorizes and reserves each operation before issuing a sender-bound grant to a resource service.</desc>
+  <rect x="0.5" y="0.5" width="1199" height="359" rx="12" fill="#101415" stroke="#303839"/>
+  <g font-family="Inter, Segoe UI, Arial, sans-serif">
+    <g fill="none" stroke="#8dd9c2" stroke-width="2.5" stroke-linecap="square">
+      <path d="M67 47H57V71H67 M77 47H87V71H77"/>
+      <path d="M68 59H76"/>
+    </g>
+    <text x="104" y="65" fill="#c1c8c7" font-size="14" font-weight="500" letter-spacing="1.6">ZANII / AGENT INFRASTRUCTURE</text>
+    <text x="52" y="168" fill="#f7f8f8" font-size="76" font-weight="500" letter-spacing="-3">Zanii Boundary</text>
+    <text x="56" y="214" fill="#c1c8c7" font-size="23">Controlled execution for company AI agents.</text>
+    <path d="M56 266H704" stroke="#303839"/>
+    <text x="56" y="302" fill="#c1c8c7" font-size="14">Task-scoped access</text>
+    <circle cx="224" cy="297" r="2" fill="#8dd9c2"/>
+    <text x="244" y="302" fill="#c1c8c7" font-size="14">Independent resource checks</text>
+    <path d="M752 48V312" stroke="#303839"/>
+    <g font-size="16" text-anchor="middle">
+      <rect x="824" y="48" width="264" height="48" rx="6" fill="#191f20" stroke="#485352"/>
+      <text x="956" y="78" fill="#f7f8f8" font-weight="500">Agent</text>
+      <rect x="792" y="152" width="328" height="80" rx="8" fill="#162d27" stroke="#8dd9c2"/>
+      <text x="956" y="183" fill="#f7f8f8" font-size="20" font-weight="500">Execution boundary</text>
+      <text x="956" y="210" fill="#8dd9c2" font-size="13" letter-spacing="0.8">AUTHORIZE / RESERVE / EXECUTE</text>
+      <rect x="824" y="288" width="264" height="40" rx="6" fill="#191f20" stroke="#485352"/>
+      <text x="956" y="314" fill="#f7f8f8" font-weight="500">Resource service</text>
+    </g>
+    <g fill="none" stroke="#8dd9c2" stroke-width="1.5">
+      <path d="M956 96V140 M951 135L956 140L961 135"/>
+      <path d="M956 232V276 M951 271L956 276L961 271"/>
+    </g>
+    <g fill="#c1c8c7" font-size="13" font-family="Consolas, Liberation Mono, monospace">
+      <text x="976" y="126">mTLS</text>
+      <text x="976" y="262">Sender-bound grant</text>
+    </g>
+  </g>
+</svg>

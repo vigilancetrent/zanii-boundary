@@ -1,0 +1,70 @@
+{
+  "version": 1,
+  "role": "archive",
+  "realm": "gateway",
+  "storage": {
+    "backend": "postgres",
+    "retentionMs": 86400000,
+    "postgres": {
+      "credentialsFile": "/run/secrets/archive_gateway_postgres_credentials",
+      "caFile": "/run/trust/postgres-ca.pem",
+      "maxConnections": 2,
+      "acquireTimeoutMs": 1000,
+      "queryTimeoutMs": 2000,
+      "statementTimeoutMs": 1500,
+      "lockTimeoutMs": 500
+    }
+  },
+  "worker": {
+    "pollIntervalMs": 1000,
+    "leaseMs": 30000,
+    "timeoutMs": 20000,
+    "batchSize": 10
+  },
+  "services": {
+    "archive": {
+      "objectStorage": {
+        "endpoint": "https://objects.company.invalid",
+        "region": "eu-central-1",
+        "credentialsFile": "/run/secrets/archive_gateway_objects_credentials",
+        "caFile": "/run/trust/provider-ca.pem",
+        "allowPrivateNetworks": true,
+        "timeoutMs": 10000,
+        "bucket": "runtime-archive-gateway",
+        "prefix": "gateway",
+        "indexKeyFile": "/run/secrets/archive_gateway_objects_index_key",
+        "encryptionKeyFile": "/run/secrets/archive_gateway_objects_data_key",
+        "encryptionKeyId": "archive-objects-v1",
+        "serverEncryption": "aws:kms",
+        "sseKmsKeyId": "REPLACE_WITH_VERIFIED_KMS_KEY_ARN",
+        "requireLock": true,
+        "maxBytes": 1048576
+      },
+      "signingKeyFile": "/run/secrets/archive_gateway_archive_signing_key",
+      "publicKeyFile": "/run/trust/archive-gateway-public.pem",
+      "retentionMs": 31536000000
+    }
+  },
+  "logging": {
+    "directory": "/var/log/runtime",
+    "maxBytes": 8388608,
+    "files": 3,
+    "maxQueueBytes": 65536,
+    "required": true
+  },
+  "telemetry": {
+    "serviceName": "runtime-archive-gateway",
+    "samplingRatio": 0.1,
+    "maxQueueSize": 512,
+    "maxExportBatchSize": 64,
+    "exportTimeoutMs": 3000,
+    "scheduledDelayMs": 1000,
+    "collector": {
+      "url": "https://otel-collector:4318/v1/traces",
+      "caFile": "/run/trust/monitoring-ca.pem",
+      "certFile": "/run/secrets/archive_gateway_otel_cert",
+      "keyFile": "/run/secrets/archive_gateway_otel_key",
+      "allowPrivateNetworks": true
+    }
+  }
+}

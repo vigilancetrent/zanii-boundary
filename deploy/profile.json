@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "name": "linux-no-network-v1",
+  "socketPath": "/run/runtime/gateway.sock",
+  "identityFile": "/run/identity/agent.jwt",
+  "identityFiles": ["agent.jwt", "agent-cert.pem", "agent-key.pem", "ca.pem"],
+  "gatewayUser": "10001:2000",
+  "resourceUser": "10002:2000",
+  "agentUser": "10003:2000",
+  "receiptLifetimeMs": 900000,
+  "checks": ["authenticated-action", "container-controls", "external-network", "cloud-metadata", "backend-network", "dns", "secret-files", "runtime-socket", "socket-directory", "child-inheritance"]
+}

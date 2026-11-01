@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "role": "migrator",
+  "realm": "resource",
+  "storage": {
+    "backend": "postgres",
+    "retentionMs": 86400000,
+    "postgres": {
+      "credentialsFile": "/run/secrets/migrator_resource_postgres_credentials",
+      "caFile": "/run/trust/postgres-ca.pem",
+      "maxConnections": 1,
+      "acquireTimeoutMs": 1000,
+      "queryTimeoutMs": 2000,
+      "statementTimeoutMs": 1500,
+      "lockTimeoutMs": 500
+    }
+  },
+  "worker": {
+    "pollIntervalMs": 1000,
+    "leaseMs": 30000,
+    "timeoutMs": 20000,
+    "batchSize": 10
+  },
+  "services": {}
+}

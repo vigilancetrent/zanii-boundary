@@ -1,0 +1,46 @@
+name: Product gates
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.19.0'
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Install explicitly versioned development scanners
+        run: >-
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund
+          typescript@6.0.3 eslint@9.39.5 @types/node@26.6.6
+          secretlint@13.1.0 @secretlint/secretlint-rule-preset-recommend@13.1.0
+      - run: python -m pip install cryptography==50.0.0
+      - run: python scripts/test-pki.py --flat --output artifacts
+      - run: npm run product:check
+      - run: npm run product:lint
+      - run: npm run product:typecheck
+      - name: Scan source and documentation, excluding generated PKI and databases
+        run: npx --no-install secretlint 'src/**/*.mjs' 'scripts/*.mjs' 'scripts/*.py' 'sdk/**/*.py' 'config/**/*' 'deploy/*' 'test/*.mjs' 'fixtures/*.json' 'docs/*.md' '*.md' 'paper/*.md'
+      - run: npm test
+      - run: npm run test:isolated
+      - run: node --test --test-isolation=none test/acceptance-product-socket.mjs
+      - run: python -m unittest discover -s sdk/python -p 'test_*.py'
+      - run: npm audit --audit-level=high
+      - run: npm run product:evaluate
+      - run: npm run product:load
+      - uses: actions/upload-artifact@v4
+        with:
+          name: public-product-measurements
+          path: |
+            artifacts/product-evaluation.json
+            artifacts/product-evaluation.signed.json
+            artifacts/product-evaluator-public.pem
+            artifacts/product-load.json
+          if-no-files-found: error

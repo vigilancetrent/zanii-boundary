@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "role": "gateway",
+  "profile": "production",
+  "listen": {
+    "host": "0.0.0.0",
+    "port": 8443
+  },
+  "tls": {
+    "certFile": "/run/secrets/gateway_tls_cert",
+    "keyFile": "/run/secrets/gateway_tls_key",
+    "caFile": "/run/trust/ca.pem",
+    "requireClientCertificate": true
+  },
+  "auth": {
+    "issuer": "https://issuer.company.invalid",
+    "audience": "company-agent-runtime",
+    "jwksFile": "/run/trust/issuer.jwks.json",
+    "algorithms": [
+      "EdDSA"
+    ],
+    "requireSenderBinding": true,
+    "maxLifetimeSeconds": 900
+  },
+  "storage": {
+    "backend": "postgres",
+    "encryptionKeyFile": "/run/secrets/gateway_data_key",
+    "auditKeyFile": "/run/secrets/gateway_audit_key",
+    "keyringFile": "/run/secrets/gateway_keyring",
+    "retentionMs": 86400000,
+    "postgres": {
+      "credentialsFile": "/run/secrets/gateway_postgres_credentials",
+      "caFile": "/run/trust/postgres-ca.pem",
+      "role": "app",
+      "maxConnections": 8,
+      "acquireTimeoutMs": 1000,
+      "queryTimeoutMs": 2000,
+      "statementTimeoutMs": 1500,
+      "lockTimeoutMs": 500
+    }
+  },
+  "signing": {
+    "privateKeyFile": "/run/secrets/gateway_signing_key"
+  },
+  "limits": {
+    "bodyBytes": 65536,
+    "requestTimeoutMs": 10000,
+    "rateWindowMs": 60000,
+    "rateRequests": 300,
+    "maxConcurrency": 32
+  },
+  "deployment": {
+    "kind": "linux-distributed-v2",
+    "receiptFile": "/run/secrets/gateway_containment_receipt",
+    "trustKeyFile": "/run/trust/distributed-evaluator.pem",
+    "maxAgeMs": 900000,
+    "profileDigest": "REPLACE_WITH_MEASURED_PROFILE_DIGEST",
+    "imageRef": "REPLACE_WITH_VERIFIED_PRODUCT_IMAGE"
+  },
+  "integrations": {
+    "resource": {
+      "origin": "https://resource:8444",
+      "caFile": "/run/trust/ca.pem",
+      "certFile": "/run/secrets/gateway_tls_cert",
+      "keyFile": "/run/secrets/gateway_tls_key",
+      "issuer": "https://company-runtime-broker",
+      "audience": "company-document-resource",
+      "signingKeyFile": "/run/secrets/gateway_signing_key",
+      "kid": "REPLACE_WITH_BROKER_KEY_ID",
+      "allowPrivateNetworks": true,
+      "required": true
+    }
+  },
+  "protocols": {},
+  "operations": {
+    "policy": {
+      "required": true,
+      "worker": {
+        "required": true
+      },
+      "archive": {
+        "required": true
+      },
+      "backup": {
+        "required": true
+      }
+    },
+    "services": {
+      "privacy": {}
+    }
+  },
+  "logging": {
+    "directory": "/var/log/runtime",
+    "maxBytes": 8388608,
+    "files": 3,
+    "maxQueueBytes": 65536,
+    "required": true
+  },
+  "telemetry": {
+    "serviceName": "runtime-gateway",
+    "samplingRatio": 0.1,
+    "maxQueueSize": 512,
+    "maxExportBatchSize": 64,
+    "exportTimeoutMs": 3000,
+    "scheduledDelayMs": 1000,
+    "collector": {
+      "url": "https://otel-collector:4318/v1/traces",
+      "caFile": "/run/trust/monitoring-ca.pem",
+      "certFile": "/run/secrets/gateway_otel_cert",
+      "keyFile": "/run/secrets/gateway_otel_key",
+      "allowPrivateNetworks": true
+    }
+  }
+}

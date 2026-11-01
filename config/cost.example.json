@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "currency": "USD",
+  "minorDigits": 2,
+  "requiredComponents": ["compute", "database", "object-storage", "object-requests", "kms", "ledger", "network-egress", "monitoring"],
+  "quotesFile": null,
+  "usageFile": null,
+  "budgetFile": null,
+  "capacityFile": null,
+  "maxQuoteAgeMs": 2678400000,
+  "maxUsageAgeMs": 86400000
+}

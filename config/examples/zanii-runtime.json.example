@@ -1,0 +1,26 @@
+{
+  "origin": "https://ledger.company.invalid",
+  "caFile": "../.secrets/ledger-ca.pem",
+  "certFile": "../.secrets/ledger-client-cert.pem",
+  "keyFile": "../.secrets/ledger-client-key.pem",
+  "tenantId": "REPLACE_WITH_COMPANY_TENANT",
+  "agentDid": "REPLACE_WITH_DELEGATED_AGENT_DID_KEY",
+  "agentPrivateKeyFile": "../.secrets/ledger-agent.hex",
+  "delegationFile": "../.secrets/ledger-delegation.json",
+  "apiKeyFile": "../.secrets/ledger-api.token",
+  "expectedLogDid": "REPLACE_WITH_PINNED_LOG_DID_KEY",
+  "allowPrivateNetworks": true,
+  "required": true,
+  "requireRuntime": true,
+  "runtime": {
+    "version": 1,
+    "mode": "authorization-preflight-v1",
+    "ownerDid": "REPLACE_WITH_PINNED_COMPANY_OWNER_DID_KEY",
+    "revocationSnapshotFile": "../.secrets/runtime-revocations.signed.json",
+    "maxSnapshotAgeMs": 60000,
+    "timeoutMs": 3000,
+    "maxConcurrency": 4,
+    "maxArgumentBytes": 2048,
+    "maxDetailBytes": 1024
+  }
+}

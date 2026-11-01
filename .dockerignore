@@ -1,0 +1,36 @@
+# The image context admits only executable product inputs.
+**
+!package.json
+!package-lock.json
+!src/
+!src/**/
+!src/**/*.mjs
+!scripts/
+!scripts/**/
+!scripts/**/*.mjs
+!migrations/
+!migrations/**/
+!migrations/**/*.sql
+
+# Explicit private exclusions remain last, even inside an admitted directory.
+**/node_modules
+**/__pycache__
+artifacts
+archive
+.secrets
+.data
+.test-data
+.npm-cache
+.cache
+.security
+.git
+**/.env
+**/.env.*
+**/*.pem
+**/*.key
+**/*.sqlite*
+**/*.db
+**/*.db-*
+**/*.snapshot
+**/*.pending
+**/*.oci.tar

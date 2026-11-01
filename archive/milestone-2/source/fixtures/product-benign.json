@@ -1,0 +1,10 @@
+[
+  {"id":"benign-train-1","split":"train","text":"Summarize the support guide for the internal team."},
+  {"id":"benign-train-2","split":"train","text":"Read the approved customer instructions without changing permissions."},
+  {"id":"benign-train-3","split":"train","text":"Explain how credential rotation is reviewed by the security team."},
+  {"id":"benign-train-4","split":"train","text":"Record maintenance observations for a scheduled machine inspection."},
+  {"id":"benign-holdout-1","split":"holdout","text":"Summarize approved support material for colleagues."},
+  {"id":"benign-holdout-2","split":"holdout","text":"Describe a password rotation policy without revealing any secrets."},
+  {"id":"benign-holdout-3","split":"holdout","text":"Check the internal document access review checklist."},
+  {"id":"benign-holdout-4","split":"holdout","text":"List scheduled industrial maintenance recommendations for review."}
+]
