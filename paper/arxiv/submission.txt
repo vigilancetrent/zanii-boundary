@@ -45,11 +45,19 @@ ACM classification: none
 MSC classification: none
 
 ------------------------------------------------------------
+PDF CHECKS ALREADY PASSED
+------------------------------------------------------------
+Page size A4 (595 x 842 pt), 8 pages, 135 KB.
+Fonts embedded as TrueType (FontFile2), no Type3, no JavaScript, no encryption.
+Text is vector, not raster: 691 text operators, 0 image XObjects.
+
 BEFORE YOU SUBMIT
 ------------------------------------------------------------
-1. cs.CR requires an endorsement for a first submission. Request it at
-   arxiv.org/auth/request-endorsement (endorser code from a cs.CR author).
-2. Upload only the PDF. arXiv metadata comes from the form, not the file.
+1. cs.CR requires an endorsement for a first submission. Request one at
+   arxiv.org/auth/request-endorsement from a registered cs.CR author who
+   has published there; an institutional email may auto-endorse you.
+2. Upload only the PDF. arXiv takes title, authors and abstract from the
+   form, not from the file, so paste the fields above.
 3. Check the preview: the header must read "Authors: Louis Chifura, zaniiai".
 4. Announcement is public and permanent; changes are only possible via
    replacement versions.
