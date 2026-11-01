@@ -113,7 +113,7 @@ Boundary does not offer universal protection for arbitrary agents, unrestricted 
 | Interfaces | [Product API](docs/product-api.md), [adapter ports](docs/adapter-ports.md) |
 | Operations | [Operator guide](docs/product-operations.md), [monitoring runbook](docs/monitoring-runbook.md) |
 | Evaluation | [Capacity measurement](docs/capacity-measurement.md), [capacity and cost](docs/capacity-cost.md), [readiness](docs/product-readiness-report.md) |
-| Research | [White paper](https://vigilancetrent.github.io/zanii-boundary/paper/white-paper.html) ([source](paper/white-paper.md)), [historical milestones](archive/) |
+| Research | [White paper](https://vigilancetrent.github.io/zanii-boundary/paper/white-paper.html) ([PDF](https://vigilancetrent.github.io/zanii-boundary/paper/zanii-boundary-white-paper.pdf), [source](paper/white-paper.md)), [historical milestones](archive/) |
 
 Historical milestones are retained for reproducibility and do not evaluate the current product. The white paper is a public engineering preprint, not a peer-reviewed or independently reproduced result. No first-invention, patentability or superiority claim is established.
 
