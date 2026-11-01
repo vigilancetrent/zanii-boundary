@@ -119,4 +119,4 @@ Historical milestones are retained for reproducibility and do not evaluate the c
 
 ## Credits
 
-Created by **Louis Chifura** (`@vigilancetrent`) and **zaniiai**. The white-paper draft retains its existing author attribution, **zinii ai**.
+Created by **Louis Chifura** (`@vigilancetrent`) and **zaniiai**.
