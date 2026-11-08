@@ -40,7 +40,7 @@ jobs:
       - run: python -m unittest discover -s sdk/python -p 'test_*.py'
       - name: Initialize actual CodeQL security analysis
         id: codeql
-        uses: github/codeql-action/init@9b3254085494b55a0f7c4c2b3d2d52cc712ce370 # 4.39.1 action, not bundle
+        uses: github/codeql-action/init@33d7b85da1a04171e211befe2c739303b9a4c066 # 4.39.1 action, not bundle
         with:
           languages: javascript-typescript,python
           tools: linked
